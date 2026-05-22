@@ -25,6 +25,7 @@ If no `CLAUDE.local.md` or no `## Git conventions` block, use the defaults docum
 **Defaults:**
 
 - Format: `[TICKET-XXX] type: description` if current branch matches `^[A-Z]+-\d+`, else `type: description`
+- Subject follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) (`feat`/`fix`/`refactor`/`docs`/`test`/`chore`/`perf`/`ci`/`build`/`style`/`revert`)
 - Subject: imperative, lowercase, no period, ≤72 chars
 - Body: explain what + why for non-trivial changes; skip for trivial
 - **NO** `Co-Authored-By` trailer

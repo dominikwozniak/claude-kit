@@ -54,6 +54,23 @@ check_optional "Deno" "deno" "brew install deno"
 check_optional "pnpm" "pnpm" "brew install pnpm"
 
 echo
+echo "Git commit signing:"
+check_git_signing() {
+  local sk gpgsign
+  sk=$(git config --global --get user.signingkey 2>/dev/null || true)
+  gpgsign=$(git config --global --get commit.gpgsign 2>/dev/null || true)
+  if [[ -n "$sk" && "$gpgsign" == "true" ]]; then
+    green "✓ commit signing configured (key + commit.gpgsign=true)"
+  else
+    yellow "~ commit signing not fully configured"
+    [[ -z "$sk" ]] && yellow "  - user.signingkey not set"
+    [[ "$gpgsign" != "true" ]] && yellow "  - commit.gpgsign not true"
+    yellow "  - see: https://docs.github.com/en/authentication/managing-commit-signature-verification"
+  fi
+}
+check_git_signing
+
+echo
 echo "Claude Code plugins (checks ~/.claude/settings.json enabledPlugins):"
 check_claude_plugin "caveman"
 check_claude_plugin "claude-mem"

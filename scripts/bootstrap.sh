@@ -108,6 +108,13 @@ if prompt_overwrite "CLAUDE.local.md"; then
   LINT_CMD=$(prompt_or_default "Lint command" "${LINT_CMD:-npm run lint}")
   TYPECHECK_CMD=$(prompt_or_default "Typecheck command" "${TYPECHECK_CMD:-npm run typecheck}")
 
+  echo
+  echo "Project context (1 line each — Enter to skip, fill later):"
+  DOMAIN_BLURB=$(prompt_or_default "Domain blurb (what this project does)" "_(fill in later)_")
+  KEY_DIRS=$(prompt_or_default "Key directories (e.g. src/, packages/api/)" "_(fill in later)_")
+  DEPLOY_TARGET=$(prompt_or_default "Deployment target (e.g. Vercel, AWS Lambda, n/a)" "_(fill in later)_")
+  GOTCHAS=$(prompt_or_default "Known gotchas (optional)" "_(fill in later)_")
+
   sed \
     -e "s|{{PROJECT_NAME}}|$PROJECT_NAME|g" \
     -e "s|{{DEFAULT_BRANCH}}|$DEFAULT_BRANCH|g" \
@@ -115,6 +122,10 @@ if prompt_overwrite "CLAUDE.local.md"; then
     -e "s|{{TEST_COMMAND}}|$TEST_CMD|g" \
     -e "s|{{LINT_COMMAND}}|$LINT_CMD|g" \
     -e "s|{{TYPECHECK_COMMAND}}|$TYPECHECK_CMD|g" \
+    -e "s|{{DOMAIN_BLURB}}|$DOMAIN_BLURB|g" \
+    -e "s|{{KEY_DIRS}}|$KEY_DIRS|g" \
+    -e "s|{{DEPLOY_TARGET}}|$DEPLOY_TARGET|g" \
+    -e "s|{{GOTCHAS}}|$GOTCHAS|g" \
     "$TEMPLATES/CLAUDE.local.md" > CLAUDE.local.md
   green "✓ CLAUDE.local.md (root, gitignored)"
 else

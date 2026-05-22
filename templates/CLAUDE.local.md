@@ -23,11 +23,17 @@ Personal Claude Code memory for this project. Gitignored. Bootstrap dropped this
 Read by the `git-workflow` skill. Overrides global defaults.
 
 - **Commit format**: `[TICKET-XXX] type: description` if branch encodes a ticket, else `type: description`
+  - Follows [Conventional Commits 1.0](https://www.conventionalcommits.org/en/v1.0.0/)
+  - Examples:
+    - `[ABC-123] feat: add password reset endpoint`
+    - `[ABC-124] fix: handle null token in middleware`
+    - `refactor: extract auth helpers into lib/auth.ts`
 - **Default branch**: {{DEFAULT_BRANCH}}
 - **Branch naming**: loose. Common when ticket exists: `XYZ-123-short-slug` or `XYZ-123/short-slug`. No enforcement.
 - **PR title**: same format as commit subject.
 - **NO** `Co-Authored-By` trailer. **NO** "Generated with Claude Code" footer.
 - **Rebase by default**: `git pull --rebase`, `git fetch origin && git rebase origin/{{DEFAULT_BRANCH}}`
+- **Signed commits**: this repo expects signed commits. Verify with `git config --global --get commit.gpgsign` (must be `true`). If unsigned, use `git commit -S` per commit or set `git config --global commit.gpgsign true` once.
 - **Modern verbs**: `git switch` / `git restore` over `git checkout`
 - **One logical change per commit**. Split when session work spans multiple concerns.
 - **Stash**: `git stash push -m "<description>"` over bare `git stash`.
@@ -38,6 +44,10 @@ Read by the `git-workflow` skill. Overrides global defaults.
 - **Test command**: `{{TEST_COMMAND}}`
 - **Lint command**: `{{LINT_COMMAND}}`
 - **Typecheck command**: `{{TYPECHECK_COMMAND}}`
+- **Domain**: {{DOMAIN_BLURB}}
+- **Key directories**: {{KEY_DIRS}}
+- **Deployment target**: {{DEPLOY_TARGET}}
+- **Gotchas**: {{GOTCHAS}}
 
 ## Hooks installed
 

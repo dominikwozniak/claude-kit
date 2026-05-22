@@ -14,8 +14,19 @@ If the branch doesn't encode a ticket, omit the prefix:
 type: description
 ```
 
+Follows [Conventional Commits 1.0](https://www.conventionalcommits.org/en/v1.0.0/).
+
+Examples:
+
+```
+[ABC-123] feat: add password reset endpoint
+[ABC-124] fix: handle null token in middleware
+refactor: extract auth helpers into lib/auth.ts
+```
+
 Rules:
 
+- Type from: `feat` / `fix` / `refactor` / `docs` / `test` / `chore` / `perf` / `ci` / `build` / `style` / `revert`
 - Imperative, lowercase, no period, ≤72 chars on subject
 - Body explains *what* and *why* — the diff shows *how*. Skip for trivial changes
 - **NO** `Co-Authored-By` trailer
@@ -25,6 +36,7 @@ Rules:
 ## Git workflow
 
 - **Rebase by default**: `git pull --rebase`, `git fetch origin && git rebase origin/main`
+- **Signed commits**: expected. Verify with `git config --global --get commit.gpgsign` (must be `true`). `doctor.sh` checks this.
 - Merge only when commits are already shared and rebasing would disrupt others
 - Modern verbs: `git switch` / `git restore` over `git checkout`
 - Stash with a message: `git stash push -m "<description>"` over bare `git stash`
