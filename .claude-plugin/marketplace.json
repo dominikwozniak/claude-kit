@@ -12,17 +12,17 @@
       "name": "bootstrap-workflow",
       "version": "0.1.0",
       "source": "./plugins/bootstrap-workflow",
-      "keywords": ["bootstrap", "setup", "workflow", "templates"],
+      "keywords": ["bootstrap", "setup", "templates", "scaffolding"],
       "category": "utilities",
-      "tags": ["bootstrap", "setup"]
+      "tags": ["workflow", "automation"]
     },
     {
       "name": "git-workflow",
       "version": "0.1.0",
       "source": "./plugins/git-workflow",
-      "keywords": ["git", "commit", "pr", "pull-request", "conventions"],
+      "keywords": ["git", "commit", "pull-request", "branch", "conventions"],
       "category": "utilities",
-      "tags": ["git", "workflow"]
+      "tags": ["workflow", "version-control"]
     },
     {
       "name": "session-handoff",
@@ -30,7 +30,7 @@
       "source": "./plugins/session-handoff",
       "keywords": ["handoff", "session", "context", "continuation"],
       "category": "productivity",
-      "tags": ["handoff", "session"]
+      "tags": ["context-management", "workflow"]
     },
     {
       "name": "setup-pre-commit",
@@ -38,7 +38,7 @@
       "source": "./plugins/setup-pre-commit",
       "keywords": ["husky", "lint-staged", "prettier", "pre-commit"],
       "category": "utilities",
-      "tags": ["quality", "hooks", "linting"]
+      "tags": ["quality", "hooks", "linting", "automation"]
     }
   ]
 }
