@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Verify the tools dominikwozniak-skills expects are installed.
+# Verify the tools claude-kit expects are installed.
 # Exit 0 on clean run, 1 if any required tool is missing.
 
 set -uo pipefail
@@ -38,7 +38,7 @@ check_claude_plugin() {
   fi
 }
 
-echo "dominikwozniak-skills — doctor"
+echo "claude-kit — doctor"
 echo "──────────────────────────────"
 
 echo

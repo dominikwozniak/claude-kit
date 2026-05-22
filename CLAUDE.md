@@ -1,4 +1,4 @@
-# dominikwozniak-skills — agent instructions
+# claude-kit — agent instructions
 
 This is **not** a code project — it's a Claude Code starter kit. Skills, templates, and a bootstrap script.
 

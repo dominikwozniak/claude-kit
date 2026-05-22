@@ -1,16 +1,16 @@
 ---
 name: bootstrap-workflow
 description: >-
-  Use when applying the dominikwozniak-skills setup to a new project — drops
+  Use when applying the claude-kit setup to a new project — drops
   CLAUDE.local.md, .claude/settings.local.json, three hook scripts, and updates
   .gitignore. All artifacts are local/gitignored. Trigger phrases: "bootstrap
-  this project", "set up workflow", "apply dominikwozniak-skills".
+  this project", "set up workflow", "apply claude-kit".
 disable-model-invocation: true
 ---
 
 # Workflow Bootstrap
 
-Apply the dominikwozniak-skills personal setup to the current project. Everything dropped is gitignored — safe to run repeatedly.
+Apply the claude-kit personal setup to the current project. Everything dropped is gitignored — safe to run repeatedly.
 
 ## What gets installed
 
@@ -25,10 +25,10 @@ Apply the dominikwozniak-skills personal setup to the current project. Everythin
 
 ### 1. Locate the bootstrap script
 
-Find the dominikwozniak-skills repo path. Default location:
+Find the claude-kit repo path. Default location:
 
 ```bash
-ls ~/workspace/private/byarcadia-packages/dominikwozniak-skills/scripts/bootstrap.sh
+ls ~/workspace/private/byarcadia-packages/claude-kit/scripts/bootstrap.sh
 ```
 
 If absent, ask the user where the repo is cloned.
@@ -36,7 +36,7 @@ If absent, ask the user where the repo is cloned.
 ### 2. Run bootstrap
 
 ```bash
-~/workspace/private/byarcadia-packages/dominikwozniak-skills/scripts/bootstrap.sh "$(pwd)"
+~/workspace/private/byarcadia-packages/claude-kit/scripts/bootstrap.sh "$(pwd)"
 ```
 
 The script:
@@ -57,7 +57,7 @@ Show the resulting `CLAUDE.local.md`. Ask if any conventions need adjusting (com
 Tell the user to:
 
 ```
-/plugin marketplace add file:///path/to/dominikwozniak-skills
+/plugin marketplace add file:///path/to/claude-kit
 /plugin install bootstrap-workflow
 /plugin install git-workflow
 /plugin install session-handoff

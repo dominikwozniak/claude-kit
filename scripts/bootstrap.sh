@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Drop dominikwozniak-skills templates into a target project.
+# Drop claude-kit templates into a target project.
 # Everything written is local/gitignored — safe to overwrite.
 #
 # Usage: bootstrap.sh <target-dir>
@@ -29,7 +29,7 @@ if [[ ! -d "$TARGET/.git" ]]; then
   exit 1
 fi
 
-echo "Bootstrapping dominikwozniak-skills into: $TARGET"
+echo "Bootstrapping claude-kit into: $TARGET"
 echo
 
 # Optional doctor — warn but continue.
@@ -155,7 +155,7 @@ done
 
 # --- 4. .gitignore additions (idempotent via marker) ----------------------
 
-MARKER_BEGIN="# dominikwozniak-skills bootstrap (BEGIN)"
+MARKER_BEGIN="# claude-kit bootstrap (BEGIN)"
 touch .gitignore
 
 if grep -qF "$MARKER_BEGIN" .gitignore; then

@@ -1,8 +1,8 @@
-# dominikwozniak-skills bootstrap (BEGIN)
+# claude-kit bootstrap (BEGIN)
 .agent/
 CLAUDE.local.md
 .claude/settings.local.json
 .claude/hooks/block-dangerous-git.sh
 .claude/hooks/lint-on-edit.sh
 .claude/hooks/typecheck-on-stop.sh
-# dominikwozniak-skills bootstrap (END)
+# claude-kit bootstrap (END)

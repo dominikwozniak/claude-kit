@@ -1,4 +1,4 @@
-# dominikwozniak-skills
+# claude-kit
 
 An opinionated Claude Code starter kit. Drop into any project, get a working AI dev setup in seconds.
 
@@ -7,13 +7,13 @@ An opinionated Claude Code starter kit. Drop into any project, get a working AI 
 Add the marketplace once (in Claude Code):
 
 ```
-/plugin marketplace add github:dominikwozniak/dominikwozniak-skills
+/plugin marketplace add github:dominikwozniak/claude-kit
 ```
 
 Bootstrap a project (drops local-only, gitignored artifacts):
 
 ```bash
-~/path/to/dominikwozniak-skills/scripts/bootstrap.sh /path/to/your/project
+~/path/to/claude-kit/scripts/bootstrap.sh /path/to/your/project
 ```
 
 Install plugins inside the project:
