@@ -18,14 +18,14 @@ Underneath: a tiny PreToolUse hook that blocks `npm`/`yarn`/`bun` so the agent c
 
 ## 🚀 Quick start
 
-In Claude Code, add the marketplace once:
+Add the marketplace once, then install plugins:
 
 ```
-/plugin marketplace add github:dominikwozniak/claude-kit
-/plugin install bootstrap-workflow
-/plugin install git-workflow
-/plugin install session-handoff
-/plugin install setup-pre-commit   # only if your team wants husky + lint-staged
+claude plugin marketplace add git@github.com:dominikwozniak/claude-kit.git
+claude plugin install bootstrap-workflow
+claude plugin install git-workflow
+claude plugin install session-handoff
+claude plugin install setup-pre-commit   # only if your team wants husky + lint-staged
 ```
 
 Then, inside any project you want to bootstrap, invoke the `bootstrap-workflow` skill. Claude runs `${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.sh "$(pwd)"`, drops the local-only artifacts, and you're done. No clone of this repo required.
