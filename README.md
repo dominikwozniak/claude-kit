@@ -27,12 +27,12 @@ Install plugins inside the project:
 
 ## Plugins
 
-| Plugin | What it does | Use when |
-|---|---|---|
-| `bootstrap-workflow` | Runs `bootstrap.sh` against the current project | First setup in any new repo |
-| `git-workflow` | Commit / push / PR / sync, reads `CLAUDE.local.md` for conventions | Daily git work |
-| `session-handoff` | Compacts session into `.agent/handoffs/<ts>.md` | Switching agents or sessions |
-| `setup-pre-commit` | Installs husky + lint-staged + prettier (team-shared, committed) | Team wants enforced pre-commit |
+| Plugin               | What it does                                                       | Use when                       |
+| -------------------- | ------------------------------------------------------------------ | ------------------------------ |
+| `bootstrap-workflow` | Runs `bootstrap.sh` against the current project                    | First setup in any new repo    |
+| `git-workflow`       | Commit / push / PR / sync, reads `CLAUDE.local.md` for conventions | Daily git work                 |
+| `session-handoff`    | Compacts session into `.agent/handoffs/<ts>.md`                    | Switching agents or sessions   |
+| `setup-pre-commit`   | Installs husky + lint-staged + prettier (team-shared, committed)   | Team wants enforced pre-commit |
 
 Every skill's canonical file lives in `skills/<name>/SKILL.md`. Each plugin's `skills/<name>` is a git-tracked symlink pointing back at the canonical file — edit in `skills/`, never via the symlink. Windows clones need `git config --global core.symlinks true`.
 

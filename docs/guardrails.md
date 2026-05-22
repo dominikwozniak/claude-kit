@@ -6,16 +6,16 @@ What `bootstrap.sh` wires into `.claude/settings.local.json` to keep the agent f
 
 `templates/hooks/block-dangerous-git.sh` blocks these patterns outright. Agent sees stderr and self-corrects.
 
-| Pattern              | Why                                                            |
-| -------------------- | -------------------------------------------------------------- |
-| `git push --force`   | Rewrites shared history; lost commits are unrecoverable        |
-| `git push -f`        | Same as above, short form                                      |
-| `git reset --hard`   | Discards uncommitted work without recovery                     |
-| `git clean -f`       | Deletes untracked files permanently                            |
-| `git clean -fd`      | Same, with directories                                         |
-| `git branch -D`      | Force-deletes a branch even if unmerged                        |
-| `git checkout .`     | Discards all unstaged changes                                  |
-| `git restore .`      | Same as above (modern syntax)                                  |
+| Pattern            | Why                                                     |
+| ------------------ | ------------------------------------------------------- |
+| `git push --force` | Rewrites shared history; lost commits are unrecoverable |
+| `git push -f`      | Same as above, short form                               |
+| `git reset --hard` | Discards uncommitted work without recovery              |
+| `git clean -f`     | Deletes untracked files permanently                     |
+| `git clean -fd`    | Same, with directories                                  |
+| `git branch -D`    | Force-deletes a branch even if unmerged                 |
+| `git checkout .`   | Discards all unstaged changes                           |
+| `git restore .`    | Same as above (modern syntax)                           |
 
 To extend: edit `templates/hooks/block-dangerous-git.sh` and append patterns to `DANGEROUS_PATTERNS`.
 

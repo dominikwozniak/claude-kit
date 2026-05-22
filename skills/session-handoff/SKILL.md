@@ -84,6 +84,7 @@ Filename uses local time. Example: `.agent/handoffs/20260522-1430.md`.
 Tell the user:
 
 > Handoff saved to `.agent/handoffs/<filename>`. Open a new Claude Code session and run:
+>
 > ```
 > Read the handoff at .agent/handoffs/<filename> and continue from there.
 > ```

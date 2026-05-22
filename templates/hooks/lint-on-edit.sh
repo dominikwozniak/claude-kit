@@ -4,7 +4,7 @@
 # Lint command resolved in order:
 #   1. CLAUDE.local.md "Lint command:" value (if present)
 #   2. package.json scripts.lint (with --fix if eslint/biome detected)
-#   3. pnpm exec eslint --fix / npx eslint --fix / deno lint
+#   3. pnpm exec eslint --fix / npx eslint --fix
 # Exits 0 on success, 2 + stderr on lint failure so Claude self-corrects.
 
 set -uo pipefail
@@ -42,10 +42,6 @@ resolve_lint_cmd() {
   fi
   if command -v npx >/dev/null && [[ -f "package.json" ]] && jq -e '.devDependencies.eslint // .dependencies.eslint' package.json >/dev/null 2>&1; then
     echo "npx eslint --fix --max-warnings 0"
-    return
-  fi
-  if [[ -f "deno.json" || -f "deno.jsonc" ]] && command -v deno >/dev/null; then
-    echo "deno lint"
     return
   fi
   echo ""

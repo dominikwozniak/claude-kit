@@ -1,0 +1,6 @@
+node_modules/
+pnpm-lock.yaml
+.agent/
+.deno/
+LICENSE
+templates/CLAUDE.local.md

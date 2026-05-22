@@ -57,12 +57,12 @@ echo "Required CLI tools:"
 check_required "git" "git"
 check_required "jq" "jq"
 check_required "gh" "gh"
+check_required "pnpm" "pnpm"
+check_required "node" "node"
 
 echo
 echo "Optional CLI tools:"
 check_optional "rtk" "rtk" "brew install rtk-ai/rtk/rtk"
-check_optional "Deno" "deno" "brew install deno"
-check_optional "pnpm" "pnpm" "brew install pnpm"
 
 echo
 echo "Git commit signing:"

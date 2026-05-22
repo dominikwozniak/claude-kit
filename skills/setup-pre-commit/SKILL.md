@@ -24,12 +24,12 @@ This is **not** part of the bootstrap script — bootstrap drops local-only file
 
 Check for the lockfile present in the repo root:
 
-| Lockfile         | Manager  |
-| ---------------- | -------- |
-| `pnpm-lock.yaml` | pnpm     |
-| `yarn.lock`      | yarn     |
-| `bun.lockb`      | bun      |
-| `package-lock.json` | npm   |
+| Lockfile            | Manager |
+| ------------------- | ------- |
+| `pnpm-lock.yaml`    | pnpm    |
+| `yarn.lock`         | yarn    |
+| `bun.lockb`         | bun     |
+| `package-lock.json` | npm     |
 
 Default to `npm` if none present.
 
@@ -37,7 +37,7 @@ Default to `npm` if none present.
 
 If the detected manager is `pnpm`, lock down the repo so teammates and CI can't accidentally use npm/yarn/bun. **Skip this step entirely for other managers** — don't migrate them silently.
 
-Ask the user once: *"Detected pnpm. Enforce pnpm-only (`packageManager` + `preinstall: only-allow pnpm` + `.npmrc engine-strict`)?"* Default yes; honor `--no-enforce-pm` if supplied.
+Ask the user once: _"Detected pnpm. Enforce pnpm-only (`packageManager` + `preinstall: only-allow pnpm` + `.npmrc engine-strict`)?"_ Default yes; honor `--no-enforce-pm` if supplied.
 
 If yes:
 
@@ -141,21 +141,6 @@ git commit -m "chore: add husky + lint-staged pre-commit hook"
 If the pnpm-only step (1a) ran, the commit also includes `packageManager`, `scripts.preinstall`, and `.npmrc`. Either roll into one commit with message `chore: add pre-commit hooks + enforce pnpm-only` or split into two — user's call.
 
 NO Co-Authored-By trailer, NO "Generated with Claude Code" footer (per project conventions).
-
-## Non-JS projects
-
-**Deno:** No husky. Native git hook:
-
-```bash
-mkdir -p .git/hooks
-cat > .git/hooks/pre-commit <<'EOF'
-#!/bin/sh
-deno fmt --check && deno lint
-EOF
-chmod +x .git/hooks/pre-commit
-```
-
-**Python (Ruff):** Use the `pre-commit` framework — different tool, beyond this skill's scope.
 
 ## Notes
 

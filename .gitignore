@@ -6,6 +6,9 @@
 .idea/
 *.swp
 
+# Node / pnpm (CI tooling: agnix, prettier)
+node_modules/
+
 # Local agent state (this repo dogfoods its own conventions)
 # Root-only patterns so templates/CLAUDE.local.md (a template, not actual memory) is tracked
 /.agent/

@@ -28,7 +28,7 @@ Rules:
 
 - Type from: `feat` / `fix` / `refactor` / `docs` / `test` / `chore` / `perf` / `ci` / `build` / `style` / `revert`
 - Imperative, lowercase, no period, ≤72 chars on subject
-- Body explains *what* and *why* — the diff shows *how*. Skip for trivial changes
+- Body explains _what_ and _why_ — the diff shows _how_. Skip for trivial changes
 - **NO** `Co-Authored-By` trailer
 - **NO** "Generated with Claude Code" or similar attribution footer
 - One logical change per commit. When session work spans multiple concerns, split commits
@@ -74,7 +74,8 @@ XYZ-123/short-slug
 
 ```markdown
 ## Git conventions
+
 - Default branch: develop
 - Branch naming: feature/<ticket>-<slug>
-- Commit format: type: description   <!-- skip ticket prefix even if branch encodes one -->
+- Commit format: type: description <!-- skip ticket prefix even if branch encodes one -->
 ```

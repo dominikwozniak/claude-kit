@@ -1,0 +1,21 @@
+# agnix lint config — claude-kit is a Claude Code starter kit.
+# Docs: https://agent-sh.github.io/agnix/docs/configuration
+target = "ClaudeCode"
+severity = "Warning"
+
+exclude = [
+    "node_modules/**",
+    ".git/**",
+    # templates/ contains placeholder configs copied into target projects;
+    # `${CLAUDE_PROJECT_DIR}/.claude/hooks/*.sh` paths resolve in the consuming
+    # project, not here. Linting them produces false-positive "file not found".
+    "templates/**",
+]
+
+[rules]
+skills = true
+hooks = true
+plugins = true
+mcp = true
+frontmatter_validation = true
+import_references = true
