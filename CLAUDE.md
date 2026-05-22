@@ -6,13 +6,13 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 
 - **`skills/`** — canonical home for every skill. Flat: `skills/<name>/SKILL.md`. Edit skills HERE, never via the symlink under `plugins/`.
 - **`docs/`** — public-facing docs: `stack.md`, `workflow.md`, `conventions.md`, `guardrails.md`
-- **`templates/`** — drop-in artifacts copied into projects by `bootstrap.sh`. ALL local/gitignored: `CLAUDE.local.md`, `settings.local.json`, `hooks/`, `gitignore-additions`
+- **`templates/`** — drop-in artifacts copied into projects by `bootstrap.sh`. ALL local/gitignored: `CLAUDE.local.md`, `settings.local.json`, `hooks/`, `gitignore-additions`. Symlinked into `plugins/bootstrap-workflow/templates`.
 - **`plugins/`** — Claude Code plugins exposed via `.claude-plugin/marketplace.json`. Each plugin's `skills/<name>` is a **git-tracked symlink** (mode 120000) → `../../../skills/<name>`:
-  - `bootstrap-workflow` — invokes `scripts/bootstrap.sh`
+  - `bootstrap-workflow` — invokes `scripts/bootstrap.sh`. Plus two extra git-tracked symlinks so the plugin is self-sufficient over marketplace install: `plugins/bootstrap-workflow/scripts → ../../scripts` and `.../templates → ../../templates`. SKILL.md calls `${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.sh "$(pwd)"`.
   - `git-workflow` — single configurable commit/push/PR/sync skill
   - `session-handoff` — compact session into `.agent/handoffs/<ts>.md`
   - `setup-pre-commit` — team-shared husky + lint-staged setup
-- **`scripts/`** — `bootstrap.sh` (drops templates into a project), `doctor.sh` (verify caveman/rtk/claude-mem/gh installed)
+- **`scripts/`** — canonical home for `bootstrap.sh` (drops templates into a project) and `doctor.sh` (verify caveman/rtk/claude-mem/gh installed). Symlinked into `plugins/bootstrap-workflow/scripts`.
 - **`.claude-plugin/marketplace.json`** — makes this repo installable as a Claude Code plugin source
 
 ## Conventions
@@ -30,6 +30,7 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 - New plugin (reusing existing skill) → create `plugins/<name>/.claude-plugin/plugin.json` + symlink to the canonical skill + marketplace row
 - New hook script → add to `templates/hooks/` AND to `templates/gitignore-additions` AND to the hook wiring in `templates/settings.local.json`
 - New doc → link from README "What you get" if user-facing
+- Touching `scripts/bootstrap.sh` or anything under `templates/` → no extra steps; the `plugins/bootstrap-workflow/{scripts,templates}` symlinks pick up changes automatically (don't duplicate files into the plugin dir)
 
 ## Reference patterns
 

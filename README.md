@@ -4,26 +4,19 @@ An opinionated Claude Code starter kit. Drop into any project, get a working AI 
 
 ## Quick start
 
-Add the marketplace once (in Claude Code):
+In Claude Code, add the marketplace and install the plugins (one time):
 
 ```
 /plugin marketplace add github:dominikwozniak/claude-kit
-```
-
-Bootstrap a project (drops local-only, gitignored artifacts):
-
-```bash
-~/path/to/claude-kit/scripts/bootstrap.sh /path/to/your/project
-```
-
-Install plugins inside the project:
-
-```
 /plugin install bootstrap-workflow
 /plugin install git-workflow
 /plugin install session-handoff
 /plugin install setup-pre-commit   # only if your team wants husky + lint-staged
 ```
+
+Then, inside any project you want to bootstrap, invoke the `bootstrap-workflow` skill. Claude runs `${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.sh "$(pwd)"` and drops the local-only, gitignored artifacts. No clone of this repo required.
+
+> Contributing to claude-kit? Clone it and run `scripts/bootstrap.sh /path/to/your/project` directly — handy for testing template changes.
 
 ## Plugins
 
@@ -78,9 +71,12 @@ Not bundled here. Install separately for the full experience:
 .
 ├── skills/                    # Canonical SKILL.md files (flat: skills/<name>/SKILL.md)
 ├── docs/                      # Stack, workflow, conventions, guardrails
-├── templates/                 # Drop-in artifacts (used by bootstrap)
-├── plugins/                   # Plugin manifests; each plugins/<name>/skills/<name> symlinks → ../../../skills/<name>
-├── scripts/                   # bootstrap.sh, doctor.sh
+├── templates/                 # Drop-in artifacts (canonical; symlinked into bootstrap-workflow plugin)
+├── scripts/                   # bootstrap.sh, doctor.sh (canonical; symlinked into bootstrap-workflow plugin)
+├── plugins/                   # Plugin manifests. Symlinks in each plugin:
+│                              #   plugins/<name>/skills/<name>      → ../../../skills/<name>
+│                              #   plugins/bootstrap-workflow/scripts   → ../../scripts
+│                              #   plugins/bootstrap-workflow/templates → ../../templates
 └── .claude-plugin/            # marketplace.json
 ```
 

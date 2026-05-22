@@ -172,10 +172,9 @@ echo
 green "Done."
 echo
 echo "Next steps:"
-echo "  1. In Claude Code, add this marketplace once:"
-echo "       /plugin marketplace add file://$REPO_ROOT"
-echo "  2. Install plugins inside this project:"
-echo "       /plugin install bootstrap-workflow"
+echo "  1. If not already added, register the marketplace in Claude Code:"
+echo "       /plugin marketplace add github:dominikwozniak/claude-kit"
+echo "  2. Install companion plugins inside this project:"
 echo "       /plugin install git-workflow"
 echo "       /plugin install session-handoff"
 echo "  3. Make sure these are enabled globally (~/.claude/settings.json):"

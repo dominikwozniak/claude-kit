@@ -23,21 +23,15 @@ Apply the claude-kit personal setup to the current project. Everything dropped i
 
 ## Workflow
 
-### 1. Locate the bootstrap script
+### 1. Run bootstrap
 
-Find the claude-kit repo path. Default location:
-
-```bash
-ls ~/workspace/private/byarcadia-packages/claude-kit/scripts/bootstrap.sh
-```
-
-If absent, ask the user where the repo is cloned.
-
-### 2. Run bootstrap
+Claude Code sets `${CLAUDE_PLUGIN_ROOT}` to this plugin's install directory. The script and templates ship with the plugin via git-tracked symlinks, so no separate clone is needed.
 
 ```bash
-~/workspace/private/byarcadia-packages/claude-kit/scripts/bootstrap.sh "$(pwd)"
+"${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.sh" "$(pwd)"
 ```
+
+If `${CLAUDE_PLUGIN_ROOT}` is empty (skill invoked outside Claude Code), fall back to the local repo checkout path and ask the user.
 
 The script:
 
@@ -48,17 +42,16 @@ The script:
 5. Fills `CLAUDE.local.md` placeholders by auto-detecting `package.json` scripts + git default branch (user confirms each)
 6. Appends to `.gitignore` between marker comments
 
-### 3. Confirm with the user
+### 2. Confirm with the user
 
 Show the resulting `CLAUDE.local.md`. Ask if any conventions need adjusting (commit format, branch naming, etc.).
 
-### 4. Suggest plugins
+### 3. Suggest companion plugins
 
 Tell the user to:
 
 ```
-/plugin marketplace add file:///path/to/claude-kit
-/plugin install bootstrap-workflow
+/plugin marketplace add github:dominikwozniak/claude-kit
 /plugin install git-workflow
 /plugin install session-handoff
 ```

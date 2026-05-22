@@ -10,6 +10,10 @@ exclude = [
     # `${CLAUDE_PROJECT_DIR}/.claude/hooks/*.sh` paths resolve in the consuming
     # project, not here. Linting them produces false-positive "file not found".
     "templates/**",
+    # Same files reached via the plugin symlinks — exclude both paths to avoid
+    # duplicate scanning and false-positive "file not found" from templates/.
+    "plugins/*/templates/**",
+    "plugins/*/scripts/**",
 ]
 
 [rules]
