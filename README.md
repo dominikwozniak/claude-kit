@@ -1,10 +1,10 @@
-# claude-kit
+# 🧰 claude-kit
 
 An opinionated Claude Code starter kit. Drop it into any project and get the same sane AI dev loop everywhere.
 
 claude-kit is the toolbox I wish every Claude Code repo had on day one — bootstrap, git workflow, session handoff, optional pre-commit, plus the guardrails to keep the agent (and me, at 2am) from breaking things. Install once from the marketplace; bootstrap each project in seconds.
 
-## Why it exists
+## 🤔 Why it exists
 
 Every Claude Code project I touch needs the same things wired up, and I got tired of doing it from scratch:
 
@@ -16,7 +16,7 @@ Every Claude Code project I touch needs the same things wired up, and I got tire
 
 Underneath: a tiny PreToolUse hook that blocks `npm`/`yarn`/`bun` so the agent can't sneak a non-pnpm install into a pnpm project.
 
-## Quick start
+## 🚀 Quick start
 
 In Claude Code, add the marketplace once:
 
@@ -32,7 +32,7 @@ Then, inside any project you want to bootstrap, invoke the `bootstrap-workflow` 
 
 > Contributing to claude-kit? Clone it and run `scripts/bootstrap.sh /path/to/your/project` directly — handy for testing template changes against a real project.
 
-## What you get
+## 📦 What you get
 
 Four plugins, each solving one concrete pain. Install only what you need.
 
@@ -44,7 +44,7 @@ Four plugins, each solving one concrete pain. Install only what you need.
 
 **`setup-pre-commit`** — Installs husky + lint-staged + prettier and commits the config. The one bootstrap step that affects teammates — they get the same pre-commit hook on next `pnpm install`.
 
-## The daily loop
+## 🔁 The daily loop
 
 claude-kit pairs with [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) for the actual development loop:
 
@@ -56,7 +56,7 @@ claude-kit pairs with [`addyosmani/agent-skills`](https://github.com/addyosmani/
 
 Everything those skills write goes into `.agent/` — gitignored by `bootstrap.sh`, so nothing leaks into PRs. The full lifecycle extends with `/test`, `/review`, `/ship` when you want them; the triplet above is the daily working set.
 
-## Companion plugins
+## 🧩 Companion plugins
 
 Not bundled here. Install separately for the full experience:
 
@@ -65,7 +65,7 @@ Not bundled here. Install separately for the full experience:
 - [`claude-mem`](https://github.com/thedotmack/claude-mem) — cross-session memory
 - [`rtk`](https://github.com/rtk-ai/rtk) — Bash output filter (CLI install, not a Claude Code plugin)
 
-## How bootstrap works
+## 🏗️ How bootstrap works
 
 `bootstrap.sh` writes only **local, gitignored** artifacts into the target repo:
 
@@ -87,7 +87,7 @@ Re-running is safe — every prompt asks before overwrite and the `.gitignore` b
 
 `setup-pre-commit` is the one exception — it **commits** husky + lint-staged config so the whole team is bound.
 
-## Quality bar
+## ✅ Quality bar
 
 The repo holds itself to the same bar it wires into target projects:
 
@@ -97,7 +97,7 @@ The repo holds itself to the same bar it wires into target projects:
 
 All three run in CI on `pull_request` and `push` to `main`; actions SHA-pinned, runner `ubuntu-latest`.
 
-## Layout
+## 📁 Layout
 
 ```
 .
@@ -114,6 +114,6 @@ All three run in CI on `pull_request` and `push` to `main`; actions SHA-pinned, 
 
 Every skill's canonical file lives in `skills/<name>/SKILL.md`. Each plugin's `skills/<name>` is a git-tracked symlink pointing back at the canonical file — edit in `skills/`, never via the symlink. Windows clones need `git config --global core.symlinks true`.
 
-## License
+## 📜 License
 
 MIT
