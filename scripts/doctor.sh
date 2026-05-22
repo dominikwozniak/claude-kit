@@ -38,6 +38,17 @@ check_claude_plugin() {
   fi
 }
 
+check_marketplace() {
+  local found
+  found=$(jq -r '.extraKnownMarketplaces | keys[]?' "$HOME/.claude/settings.json" 2>/dev/null \
+    | grep -E '^(claude-kit|dominikwozniak-skills)$' || true)
+  if [[ -n "$found" ]]; then
+    green "✓ marketplace registered: $found"
+  else
+    yellow "~ claude-kit marketplace not registered — run /plugin marketplace add github:dominikwozniak/claude-kit"
+  fi
+}
+
 echo "claude-kit — doctor"
 echo "──────────────────────────────"
 
@@ -75,6 +86,14 @@ echo "Claude Code plugins (checks ~/.claude/settings.json enabledPlugins):"
 check_claude_plugin "caveman"
 check_claude_plugin "claude-mem"
 check_claude_plugin "agent-skills"
+
+echo
+echo "claude-kit marketplace + plugins:"
+check_marketplace
+check_claude_plugin "bootstrap-workflow"
+check_claude_plugin "git-workflow"
+check_claude_plugin "session-handoff"
+check_claude_plugin "setup-pre-commit"
 
 echo
 if [[ $missing_required -ne 0 ]]; then
