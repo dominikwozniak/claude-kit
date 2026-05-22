@@ -1,0 +1,9 @@
+{
+  "name": "setup-pre-commit",
+  "version": "0.1.0",
+  "description": "Team-shared pre-commit setup: detect package manager, install husky + lint-staged (+ prettier if missing), wire .husky/pre-commit, add prepare script. COMMITS to the target repo — affects teammates.",
+  "author": {
+    "name": "Dominik Wozniak"
+  },
+  "skills": "./skills"
+}

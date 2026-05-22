@@ -1,0 +1,9 @@
+{
+  "name": "git-flow",
+  "version": "0.1.0",
+  "description": "Configurable git workflow: commit, push, PR, sync, branch, stash. Reads conventions from CLAUDE.local.md; falls back to opinionated defaults (Conventional Commits with optional [TICKET-XXX] prefix, rebase by default, no Co-Authored-By footer).",
+  "author": {
+    "name": "Dominik Wozniak"
+  },
+  "skills": "./skills"
+}
