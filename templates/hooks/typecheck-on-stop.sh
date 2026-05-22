@@ -13,7 +13,7 @@ set -uo pipefail
 command -v jq >/dev/null || exit 0
 
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
-cd "$repo_root"
+cd "$repo_root" || exit 0
 
 changed=$(
   {

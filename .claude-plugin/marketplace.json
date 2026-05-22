@@ -1,0 +1,44 @@
+{
+  "name": "dominikwozniak-skills",
+  "owner": {
+    "name": "Dominik Wozniak"
+  },
+  "metadata": {
+    "description": "An opinionated Claude Code starter kit. Workflow loop, configurable git skill, guardrails, autoloop quality hooks, handoff, and an optional pre-commit setup.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "workflow-bootstrap",
+      "version": "0.1.0",
+      "source": "./plugins/workflow-bootstrap",
+      "keywords": ["bootstrap", "setup", "workflow", "templates"],
+      "category": "utilities",
+      "tags": ["bootstrap", "setup"]
+    },
+    {
+      "name": "git-flow",
+      "version": "0.1.0",
+      "source": "./plugins/git-flow",
+      "keywords": ["git", "commit", "pr", "pull-request", "conventions"],
+      "category": "utilities",
+      "tags": ["git", "workflow"]
+    },
+    {
+      "name": "handoff",
+      "version": "0.1.0",
+      "source": "./plugins/handoff",
+      "keywords": ["handoff", "session", "context", "continuation"],
+      "category": "productivity",
+      "tags": ["handoff", "session"]
+    },
+    {
+      "name": "setup-pre-commit",
+      "version": "0.1.0",
+      "source": "./plugins/setup-pre-commit",
+      "keywords": ["husky", "lint-staged", "prettier", "pre-commit"],
+      "category": "utilities",
+      "tags": ["quality", "hooks", "linting"]
+    }
+  ]
+}

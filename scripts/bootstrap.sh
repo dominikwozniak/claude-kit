@@ -39,7 +39,7 @@ if [[ -x "$SCRIPT_DIR/doctor.sh" ]]; then
   echo
 fi
 
-cd "$TARGET"
+cd "$TARGET" || exit 1
 mkdir -p .claude/hooks .agent/handoffs
 
 # --- Helpers ---------------------------------------------------------------
@@ -145,7 +145,6 @@ done
 # --- 4. .gitignore additions (idempotent via marker) ----------------------
 
 MARKER_BEGIN="# dominikwozniak-skills bootstrap (BEGIN)"
-MARKER_END="# dominikwozniak-skills bootstrap (END)"
 touch .gitignore
 
 if grep -qF "$MARKER_BEGIN" .gitignore; then

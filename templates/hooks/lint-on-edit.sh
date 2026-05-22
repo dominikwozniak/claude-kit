@@ -25,7 +25,7 @@ esac
 [[ "$file_path" =~ \.(ts|tsx|js|jsx|mjs|cjs)$ ]] || exit 0
 
 repo_root="$(git -C "$(dirname "$file_path")" rev-parse --show-toplevel 2>/dev/null)" || exit 0
-cd "$repo_root"
+cd "$repo_root" || exit 0
 
 resolve_lint_cmd() {
   if [[ -f "CLAUDE.local.md" ]]; then
