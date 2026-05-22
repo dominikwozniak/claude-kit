@@ -10,6 +10,8 @@ This kit uses [addyosmani/agent-skills](https://github.com/addyosmani/agent-skil
 /build → implement incrementally with tests
 ```
 
+The triplet above is the daily working set. The full agent-skills lifecycle also ships `/test`, `/review`, and `/ship` — reach for them when the change warrants more rigour (new public API, security-sensitive code, production rollout).
+
 ## Conventions
 
 - **Where artifacts land**: `.agent/` at the repo root. `bootstrap.sh` adds `.agent/` to `.gitignore` so nothing leaks into PRs.

@@ -8,7 +8,7 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 - **`docs/`** — public-facing docs: `stack.md`, `workflow.md`, `conventions.md`, `guardrails.md`
 - **`templates/`** — drop-in artifacts copied into projects by `bootstrap.sh`. ALL local/gitignored: `CLAUDE.local.md`, `settings.local.json`, `hooks/`, `gitignore-additions`. Symlinked into `plugins/bootstrap-workflow/templates`.
 - **`plugins/`** — Claude Code plugins exposed via `.claude-plugin/marketplace.json`. Each plugin's `skills/<name>` is a **git-tracked symlink** (mode 120000) → `../../../skills/<name>`:
-  - `bootstrap-workflow` — invokes `scripts/bootstrap.sh`. Plus two extra git-tracked symlinks so the plugin is self-sufficient over marketplace install: `plugins/bootstrap-workflow/scripts → ../../scripts` and `.../templates → ../../templates`. SKILL.md calls `${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.sh "$(pwd)"`.
+  - `bootstrap-workflow` — invokes `scripts/bootstrap.sh`. Plus two extra git-tracked symlinks so the plugin is self-sufficient over marketplace install: `plugins/bootstrap-workflow/scripts → ../../scripts` and `.../templates → ../../templates`. SKILL.md calls `${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.sh "$(pwd)"`. Target project does NOT need to clone claude-kit — symlinks ship with the plugin install.
   - `git-workflow` — single configurable commit/push/PR/sync skill
   - `session-handoff` — compact session into `.agent/handoffs/<ts>.md`
   - `setup-pre-commit` — team-shared husky + lint-staged setup
@@ -23,6 +23,7 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 - Each plugin: `plugins/<name>/.claude-plugin/plugin.json` + `plugins/<name>/skills/<name>` (symlink → `../../../skills/<name>`)
 - All bootstrap drops are LOCAL (gitignored in target project) — overwrite is always safe
 - `setup-pre-commit` is the one exception — it COMMITS to the target repo (husky binds teammates)
+- **pnpm-only enforcement** has two layers: `templates/hooks/block-non-pnpm.sh` (PreToolUse hook, gitignored, blocks `npm`/`yarn`/`bun` during Claude sessions) + `setup-pre-commit` (committed, enforces for teammates and CI). Both ship with claude-kit; don't add a third layer.
 
 ## When editing
 
@@ -31,6 +32,7 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 - New hook script → add to `templates/hooks/` AND to `templates/gitignore-additions` AND to the hook wiring in `templates/settings.local.json`
 - New doc → link from README "What you get" if user-facing
 - Touching `scripts/bootstrap.sh` or anything under `templates/` → no extra steps; the `plugins/bootstrap-workflow/{scripts,templates}` symlinks pick up changes automatically (don't duplicate files into the plugin dir)
+- **Doc sync** — after any change, ask: does it shift what users see (`README.md`), what agents need to know (`CLAUDE.md`), or how the daily loop/bootstrap behaves (`docs/`)? Update the affected file(s) in the same commit. New plugin / pain narrative → README. New convention, new symlink, new enforcement layer → CLAUDE.md. New skill in the loop or new bootstrap step → `docs/workflow.md` or related doc. Skip if change is purely internal (lockfile, prettier-only reformat, CI tweak with no behaviour change).
 
 ## Reference patterns
 

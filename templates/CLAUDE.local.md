@@ -6,7 +6,7 @@ Personal Claude Code memory for this project. Gitignored. Bootstrap dropped this
 
 - Loop: `/spec → /plan → /build` via [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
 - Plans and specs land in `.agent/` (gitignored). **NEVER** commit them.
-- Handoff docs land in `.agent/handoffs/<YYYYMMDD-HHMM>.md`. Use `/handoff` to create one.
+- Handoff docs land in `.agent/handoffs/<YYYYMMDD-HHMM>.md`. Use `/session-handoff` to create one.
 - Delete the spec when the PR opens.
 
 ## Tools active in this session
@@ -15,8 +15,8 @@ Personal Claude Code memory for this project. Gitignored. Bootstrap dropped this
 - **rtk** — Bash output filter, rewrites commands transparently. Don't call `rtk` manually.
 - **claude-mem** — cross-session memory. Use `mem-search` when you suspect "we already solved this".
 - **gh CLI** — preferred over MCP for GitHub ops.
-- Linear / Atlassian / Notion — via MCP.
-- Sentry / Playwright — via CLI.
+- Linear / Atlassian / Notion — via MCP **if installed** for this project. Check `claude mcp list`; drop the bullet if not used.
+- Sentry / Playwright — via CLI when needed.
 
 ## Git conventions
 
@@ -57,3 +57,15 @@ PreToolUse `Bash` → `block-dangerous-git.sh` (blocks force-push, hard-reset, c
 PreToolUse `Bash` → `block-non-pnpm.sh` (enforces pnpm — blocks `npm install`/`yarn`/`bun add`; `npx` and `pnpm dlx` are allowed)
 
 Hook scripts live in `.claude/hooks/` and are gitignored.
+
+## Keep this file current
+
+This file is the source of truth for the agent _and_ the hooks. If any of these change, update the matching line here in the same commit:
+
+- Test / lint / typecheck command in `package.json` → update the `Project specifics` block (hooks read those names)
+- Default branch renamed → update `Git conventions` (`git-workflow` reads it)
+- Stack, key directories, deployment target shifts → update `Project specifics`
+- New tool installed (MCP server, CLI) or one removed → update `Tools active in this session`
+- New hook wired in `.claude/settings.local.json` → add a line under `Hooks installed`
+
+Stale placeholders silently break the linter, typecheck, and PR/commit flow.
