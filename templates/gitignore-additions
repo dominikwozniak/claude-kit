@@ -3,6 +3,7 @@
 CLAUDE.local.md
 .claude/settings.local.json
 .claude/hooks/block-dangerous-git.sh
+.claude/hooks/block-non-pnpm.sh
 .claude/hooks/lint-on-edit.sh
 .claude/hooks/typecheck-on-stop.sh
 # claude-kit bootstrap (END)

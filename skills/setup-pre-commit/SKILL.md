@@ -3,9 +3,12 @@ name: setup-pre-commit
 description: >-
   Use when adding pre-commit hooks to a JS/TS project. Detects package
   manager, installs husky + lint-staged + prettier, wires .husky/pre-commit
-  to run lint-staged (and optionally typecheck + test). COMMITS to the repo
-  — affects teammates. Trigger phrases: "set up pre-commit", "add husky",
-  "configure lint-staged", "add commit-time formatting".
+  to run lint-staged (and optionally typecheck + test). When pnpm is the
+  detected manager, also enforces pnpm-only via `packageManager` field +
+  `preinstall: npx only-allow pnpm` + `.npmrc engine-strict=true`. COMMITS
+  to the repo — affects teammates. Trigger phrases: "set up pre-commit",
+  "add husky", "configure lint-staged", "add commit-time formatting",
+  "enforce pnpm".
 disable-model-invocation: true
 ---
 
@@ -29,6 +32,40 @@ Check for the lockfile present in the repo root:
 | `package-lock.json` | npm   |
 
 Default to `npm` if none present.
+
+### 1a. Enforce pnpm-only (only if pnpm detected)
+
+If the detected manager is `pnpm`, lock down the repo so teammates and CI can't accidentally use npm/yarn/bun. **Skip this step entirely for other managers** — don't migrate them silently.
+
+Ask the user once: *"Detected pnpm. Enforce pnpm-only (`packageManager` + `preinstall: only-allow pnpm` + `.npmrc engine-strict`)?"* Default yes; honor `--no-enforce-pm` if supplied.
+
+If yes:
+
+1. **`packageManager` field** (corepack pickup):
+
+   ```bash
+   PNPM_VERSION=$(pnpm --version)
+   npm pkg set packageManager="pnpm@${PNPM_VERSION}"
+   ```
+
+2. **`preinstall` script** — hard stop for npm/yarn/bun:
+
+   ```bash
+   npm pkg set scripts.preinstall='npx only-allow pnpm'
+   ```
+
+   `only-allow` is a tiny pinpm/pnpm helper invoked via `npx`. No new dep — runs only at install time.
+
+3. **`.npmrc` `engine-strict`** — refuses install if the engines field doesn't match:
+
+   ```bash
+   touch .npmrc
+   grep -qE '^engine-strict\s*=' .npmrc || echo 'engine-strict=true' >> .npmrc
+   ```
+
+4. **Smoke-test**: run `npm install --dry-run` in a scratch shell — should fail with `only-allow` message. Run `pnpm install --frozen-lockfile` — should pass.
+
+Note: `npm pkg set` itself uses npm, but only to mutate `package.json` (no install). Safe under the local hook (`block-non-pnpm.sh` allows `npm pkg`).
 
 ### 2. Detect tooling already in `package.json`
 
@@ -95,11 +132,13 @@ Stage a small change (touch a file, then commit). The hook runs lint-staged. If 
 
 ```bash
 git add .husky/ package.json package-lock.json .lintstagedrc 2>/dev/null || true
-git add .husky/ package.json pnpm-lock.yaml .lintstagedrc 2>/dev/null || true
+git add .husky/ package.json pnpm-lock.yaml .lintstagedrc .npmrc 2>/dev/null || true
 # (adapt to actual files changed)
 
 git commit -m "chore: add husky + lint-staged pre-commit hook"
 ```
+
+If the pnpm-only step (1a) ran, the commit also includes `packageManager`, `scripts.preinstall`, and `.npmrc`. Either roll into one commit with message `chore: add pre-commit hooks + enforce pnpm-only` or split into two — user's call.
 
 NO Co-Authored-By trailer, NO "Generated with Claude Code" footer (per project conventions).
 

@@ -143,7 +143,7 @@ fi
 
 # --- 3. Hook scripts ------------------------------------------------------
 
-for hook in block-dangerous-git.sh lint-on-edit.sh typecheck-on-stop.sh; do
+for hook in block-dangerous-git.sh block-non-pnpm.sh lint-on-edit.sh typecheck-on-stop.sh; do
   if prompt_overwrite ".claude/hooks/$hook"; then
     cp "$TEMPLATES/hooks/$hook" ".claude/hooks/$hook"
     chmod +x ".claude/hooks/$hook"

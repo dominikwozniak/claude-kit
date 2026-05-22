@@ -54,5 +54,6 @@ Read by the `git-workflow` skill. Overrides global defaults.
 PostToolUse `Write|Edit|MultiEdit` → `lint-on-edit.sh` (runs `{{LINT_COMMAND}}` on the edited file)
 Stop → `typecheck-on-stop.sh` (runs `{{TYPECHECK_COMMAND}}` when TS files changed)
 PreToolUse `Bash` → `block-dangerous-git.sh` (blocks force-push, hard-reset, clean -f, etc.)
+PreToolUse `Bash` → `block-non-pnpm.sh` (enforces pnpm — blocks `npm install`/`yarn`/`bun add`; `npx` and `pnpm dlx` are allowed)
 
 Hook scripts live in `.claude/hooks/` and are gitignored.
