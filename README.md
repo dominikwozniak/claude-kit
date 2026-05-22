@@ -34,6 +34,8 @@ Install plugins inside the project:
 | `session-handoff` | Compacts session into `.agent/handoffs/<ts>.md` | Switching agents or sessions |
 | `setup-pre-commit` | Installs husky + lint-staged + prettier (team-shared, committed) | Team wants enforced pre-commit |
 
+Every skill's canonical file lives in `skills/<name>/SKILL.md`. Each plugin's `skills/<name>` is a git-tracked symlink pointing back at the canonical file — edit in `skills/`, never via the symlink. Windows clones need `git config --global core.symlinks true`.
+
 ## How it works
 
 `bootstrap.sh` writes only **local, gitignored** artifacts into the target repo:
@@ -74,9 +76,10 @@ Not bundled here. Install separately for the full experience:
 
 ```
 .
+├── skills/                    # Canonical SKILL.md files (flat: skills/<name>/SKILL.md)
 ├── docs/                      # Stack, workflow, conventions, guardrails
 ├── templates/                 # Drop-in artifacts (used by bootstrap)
-├── plugins/                   # bootstrap-workflow, git-workflow, session-handoff, setup-pre-commit
+├── plugins/                   # Plugin manifests; each plugins/<name>/skills/<name> symlinks → ../../../skills/<name>
 ├── scripts/                   # bootstrap.sh, doctor.sh
 └── .claude-plugin/            # marketplace.json
 ```
