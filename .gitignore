@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Local agent state (this repo dogfoods its own conventions)
+# Root-only patterns so templates/CLAUDE.local.md (a template, not actual memory) is tracked
+/.agent/
+/CLAUDE.local.md
+/.claude/settings.local.json
