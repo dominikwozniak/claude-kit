@@ -7,9 +7,9 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 - **`docs/`** — public-facing docs: `stack.md`, `workflow.md`, `conventions.md`, `guardrails.md`
 - **`templates/`** — drop-in artifacts copied into projects by `bootstrap.sh`. ALL local/gitignored: `CLAUDE.local.md`, `settings.local.json`, `hooks/`, `gitignore-additions`
 - **`plugins/`** — Claude Code plugins exposed via `.claude-plugin/marketplace.json`:
-  - `workflow-bootstrap` — invokes `scripts/bootstrap.sh`
-  - `git-flow` — single configurable commit/push/PR/sync skill
-  - `handoff` — compact session into `.agent/handoff-<ts>.md`
+  - `bootstrap-workflow` — invokes `scripts/bootstrap.sh`
+  - `git-workflow` — single configurable commit/push/PR/sync skill
+  - `session-handoff` — compact session into `.agent/handoffs/<ts>.md`
   - `setup-pre-commit` — team-shared husky + lint-staged setup
 - **`scripts/`** — `bootstrap.sh` (drops templates into a project), `doctor.sh` (verify caveman/rtk/claude-mem/gh installed)
 - **`.claude-plugin/marketplace.json`** — makes this repo installable as a Claude Code plugin source

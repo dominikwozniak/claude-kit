@@ -1,5 +1,5 @@
 ---
-name: git-flow
+name: git-workflow
 description: >-
   Use for any git operation in this project — commit, push, PR, sync, branch,
   stash. Reads conventions from CLAUDE.local.md; falls back to defaults.
@@ -8,7 +8,7 @@ description: >-
 disable-model-invocation: true
 ---
 
-# git-flow
+# git-workflow
 
 One skill, all git ops. Configurable via `CLAUDE.local.md`.
 
@@ -156,5 +156,5 @@ git stash push -m "<short description of what's being saved>"
 
 ## Notes
 
-- All defaults assume `block-dangerous-git.sh` hook is installed via `workflow-bootstrap`. If absent, manually refuse the same patterns (force-push, hard-reset, etc.).
+- All defaults assume `block-dangerous-git.sh` hook is installed via `bootstrap-workflow`. If absent, manually refuse the same patterns (force-push, hard-reset, etc.).
 - If the project has a PR template at `.github/PULL_REQUEST_TEMPLATE.md`, use it as the body skeleton instead of the generic summary/test-plan format above.

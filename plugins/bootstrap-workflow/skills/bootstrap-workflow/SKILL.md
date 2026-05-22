@@ -1,5 +1,5 @@
 ---
-name: workflow-bootstrap
+name: bootstrap-workflow
 description: >-
   Use when applying the dominikwozniak-skills setup to a new project — drops
   CLAUDE.local.md, .claude/settings.local.json, three hook scripts, and updates
@@ -58,9 +58,9 @@ Tell the user to:
 
 ```
 /plugin marketplace add file:///path/to/dominikwozniak-skills
-/plugin install workflow-bootstrap
-/plugin install git-flow
-/plugin install handoff
+/plugin install bootstrap-workflow
+/plugin install git-workflow
+/plugin install session-handoff
 ```
 
 …and to ensure `agent-skills` (addyosmani), `caveman`, `claude-mem` are enabled in `~/.claude/settings.json`.

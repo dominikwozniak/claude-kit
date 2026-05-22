@@ -1,15 +1,15 @@
 ---
-name: handoff
+name: session-handoff
 description: >-
   Compact the current conversation into a handoff document so another agent
   (fresh Claude Code session, Codex, etc.) can continue the work. Trigger
-  phrases: "handoff", "summarise for next session", "prepare context for
-  another agent", "wrap up so someone can pick this up".
+  phrases: "session handoff", "handoff", "summarise for next session",
+  "prepare context for another agent", "wrap up so someone can pick this up".
 argument-hint: "What will the next session focus on?"
 disable-model-invocation: true
 ---
 
-# Handoff
+# Session Handoff
 
 Write a continuation document so the next agent — fresh CC session, Codex, or a teammate's agent — can resume without re-reading the whole transcript.
 
@@ -29,7 +29,7 @@ Filename uses local time. Example: `.agent/handoffs/20260522-1430.md`.
 - **Current state** — what's been done, what's working, what's broken
 - **Open questions** — decisions the next agent needs to make or surface to the user
 - **Next steps** — ordered list of concrete actions to take next
-- **Suggested skills** — Claude Code skills the next agent should invoke (e.g., `git-flow`, `spec-driven-development`, `debugging-and-error-recovery`)
+- **Suggested skills** — Claude Code skills the next agent should invoke (e.g., `git-workflow`, `spec-driven-development`, `debugging-and-error-recovery`)
 - **Pointers** — references to existing artifacts (specs, plans, ADRs, PRs, issues) by path or URL. Don't duplicate their content
 - **Gotchas / context** — non-obvious things the next agent needs to know (env quirks, dependency versions, recent failures, etc.)
 

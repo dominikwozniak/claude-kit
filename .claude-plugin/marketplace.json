@@ -9,25 +9,25 @@
   },
   "plugins": [
     {
-      "name": "workflow-bootstrap",
+      "name": "bootstrap-workflow",
       "version": "0.1.0",
-      "source": "./plugins/workflow-bootstrap",
+      "source": "./plugins/bootstrap-workflow",
       "keywords": ["bootstrap", "setup", "workflow", "templates"],
       "category": "utilities",
       "tags": ["bootstrap", "setup"]
     },
     {
-      "name": "git-flow",
+      "name": "git-workflow",
       "version": "0.1.0",
-      "source": "./plugins/git-flow",
+      "source": "./plugins/git-workflow",
       "keywords": ["git", "commit", "pr", "pull-request", "conventions"],
       "category": "utilities",
       "tags": ["git", "workflow"]
     },
     {
-      "name": "handoff",
+      "name": "session-handoff",
       "version": "0.1.0",
-      "source": "./plugins/handoff",
+      "source": "./plugins/session-handoff",
       "keywords": ["handoff", "session", "context", "continuation"],
       "category": "productivity",
       "tags": ["handoff", "session"]

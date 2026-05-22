@@ -1,5 +1,5 @@
 {
-  "name": "workflow-bootstrap",
+  "name": "bootstrap-workflow",
   "version": "0.1.0",
   "description": "Drop dominikwozniak-skills templates (CLAUDE.local.md, settings.local.json, hooks, gitignore additions) into a project. All artifacts are local/gitignored.",
   "author": {

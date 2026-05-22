@@ -20,7 +20,7 @@ Personal Claude Code memory for this project. Gitignored. Bootstrap dropped this
 
 ## Git conventions
 
-Read by the `git-flow` skill. Overrides global defaults.
+Read by the `git-workflow` skill. Overrides global defaults.
 
 - **Commit format**: `[TICKET-XXX] type: description` if branch encodes a ticket, else `type: description`
 - **Default branch**: {{DEFAULT_BRANCH}}

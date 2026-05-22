@@ -17,12 +17,12 @@ This kit uses [addyosmani/agent-skills](https://github.com/addyosmani/agent-skil
 - **When to skip the loop**: trivial changes (typos, single-line fixes, renames). The loop's value is forcing clarity for non-trivial work.
 - **When to use it manually anyway**: even without running `/spec`, the questions the spec asks (problem, scope, acceptance criteria) are good mental hygiene.
 
-## Layered with handoff
+## Layered with session-handoff
 
 When a session gets long, or you want a different agent to continue:
 
 ```
-/handoff "What the next session will focus on"
+/session-handoff "What the next session will focus on"
 ```
 
 Writes `.agent/handoffs/<YYYYMMDD-HHMM>.md` — a compact continuation document in its own subfolder. Pick it up in a fresh Claude Code session or hand it to Codex.

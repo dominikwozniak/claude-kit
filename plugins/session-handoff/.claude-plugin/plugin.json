@@ -1,5 +1,5 @@
 {
-  "name": "handoff",
+  "name": "session-handoff",
   "version": "0.1.0",
   "description": "Compact the current conversation into a continuation document at .agent/handoffs/<YYYYMMDD-HHMM>.md so another agent (fresh Claude Code session, Codex, etc.) can pick up the work. Adapted from mattpocock/skills handoff with output redirected to a project-local folder.",
   "author": {

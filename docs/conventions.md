@@ -1,6 +1,6 @@
 # Conventions
 
-Defaults used by `git-flow` and `bootstrap.sh`. Override per project by editing the matching section in `CLAUDE.local.md`.
+Defaults used by `git-workflow` and `bootstrap.sh`. Override per project by editing the matching section in `CLAUDE.local.md`.
 
 ## Commit format
 
@@ -40,7 +40,7 @@ XYZ-123-short-slug
 XYZ-123/short-slug
 ```
 
-`git-flow` extracts the ticket key by regex `^[A-Z]+-\d+` if present and uses it in the commit and PR title.
+`git-workflow` extracts the ticket key by regex `^[A-Z]+-\d+` if present and uses it in the commit and PR title.
 
 ## Pull requests
 
@@ -58,7 +58,7 @@ XYZ-123/short-slug
 
 ## Project-level overrides
 
-`CLAUDE.local.md` can contain a `## Git conventions` block. `git-flow` reads it on each invocation and overrides the defaults above. Example:
+`CLAUDE.local.md` can contain a `## Git conventions` block. `git-workflow` reads it on each invocation and overrides the defaults above. Example:
 
 ```markdown
 ## Git conventions
