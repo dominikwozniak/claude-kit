@@ -78,9 +78,13 @@ Three questions (skip question 2 if answer to Q1 doesn't include `settings`; ski
 
 Use the detection results from step 1 as the default-checked set. Filter out JS-only hooks when `package.json` is absent — on a pure Rails repo, only `block-dangerous-git` is offered.
 
+If filtering leaves **fewer than 2 options**, do not call `AskUserQuestion` with a multi-select — that violates the tool's `minItems: 2` validation. Instead, ask a single Yes/No question naming the lone remaining hook (e.g. _"Install `block-dangerous-git` hook?"_) with options `Yes (recommended)` / `No`. Map `Yes` → include that hook in `--hooks=`; `No` → pass `--hooks=` empty. Q1 (artifacts) always has 3 fixed options, so this fallback only ever applies to Q2 and Q3.
+
 **Question 3 — Missing deps to brew install (multi-select, only when applicable):**
 
 Render the `optional_missing` array from doctor.sh as options. Pre-check none — let the user opt in.
+
+If `optional_missing` has exactly one entry, fall back to a Yes/No prompt naming that tool (e.g. _"Install `rtk` via brew?"_) with `Yes` / `No (skip)` — same `minItems: 2` reason as Q2. Skip the question entirely when the array is empty or `brew` is not on PATH.
 
 ### 4. Collect CLAUDE.local.md placeholder values
 
