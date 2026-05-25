@@ -36,7 +36,7 @@ Then, inside any project you want to bootstrap, invoke the `bootstrap-workflow` 
 
 Four plugins, each solving one concrete pain. Install only what you need.
 
-**`bootstrap-workflow`** — Runs `bootstrap.sh` against the current project. À la carte picker (via `AskUserQuestion`): pick which artifacts you want, which hooks to wire, and which missing deps to `brew install`. Pre-checks defaults from the repo's actual stack (no `block-non-pnpm` if there's no `package.json`, no `typecheck-on-stop` if there's no `tsconfig.json`). Every drop is local and gitignored, so re-running is always safe. Use it for the first setup in any new repo.
+**`bootstrap-workflow`** — Runs `bootstrap.sh` against the current project. À la carte picker (via `AskUserQuestion`): pick which artifacts you want, which hooks to wire, and which missing deps to `brew install`. Pre-checks defaults from the repo's actual stack (no `block-non-pnpm` if there's no `package.json`, no `typecheck-on-stop` if there's no `tsconfig.json`). Stack-aware: Ruby/Rails repos get `bundle exec rspec` + `standardrb`/`rubocop` defaults in `CLAUDE.local.md` and the JS-only hooks are skipped entirely. Every drop is local and gitignored, so re-running is always safe. Use it for the first setup in any new repo.
 
 **`git-workflow`** — A single configurable commit / push / PR / sync skill. Reads `CLAUDE.local.md` for per-repo conventions (commit format, default branch, PR template), falls back to defaults when the file is missing. Replaces five drive-by commands with one that knows the project.
 

@@ -5,12 +5,12 @@
   },
   "metadata": {
     "description": "An opinionated Claude Code starter kit. Workflow loop, configurable git skill, guardrails, autoloop quality hooks, handoff, and an optional pre-commit setup.",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "bootstrap-workflow",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "source": "./plugins/bootstrap-workflow",
       "keywords": ["bootstrap", "setup", "templates", "scaffolding"],
       "category": "utilities",

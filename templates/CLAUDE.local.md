@@ -41,9 +41,9 @@ Read by the `git-workflow` skill. Overrides global defaults.
 ## Project specifics
 
 - **Stack**: {{STACK}}
-- **Test command**: `{{TEST_COMMAND}}`
-- **Lint command**: `{{LINT_COMMAND}}`
-- **Typecheck command**: `{{TYPECHECK_COMMAND}}`
+- **Test command**: {{TEST_COMMAND}}
+- **Lint command**: {{LINT_COMMAND}}
+- **Typecheck command**: {{TYPECHECK_COMMAND}}
 - **Domain**: {{DOMAIN_BLURB}}
 - **Key directories**: {{KEY_DIRS}}
 - **Deployment target**: {{DEPLOY_TARGET}}
@@ -51,10 +51,7 @@ Read by the `git-workflow` skill. Overrides global defaults.
 
 ## Hooks installed
 
-PostToolUse `Write|Edit|MultiEdit` → `lint-on-edit.sh` (runs `{{LINT_COMMAND}}` on the edited file)
-Stop → `typecheck-on-stop.sh` (runs `{{TYPECHECK_COMMAND}}` when TS files changed)
-PreToolUse `Bash` → `block-dangerous-git.sh` (blocks force-push, hard-reset, clean -f, etc.)
-PreToolUse `Bash` → `block-non-pnpm.sh` (enforces pnpm — blocks `npm install`/`yarn`/`bun add`; `npx` and `pnpm dlx` are allowed)
+{{HOOKS_INSTALLED}}
 
 Hook scripts live in `.claude/hooks/` and are gitignored.
 
@@ -62,7 +59,7 @@ Hook scripts live in `.claude/hooks/` and are gitignored.
 
 This file is the source of truth for the agent _and_ the hooks. If any of these change, update the matching line here in the same commit:
 
-- Test / lint / typecheck command in `package.json` → update the `Project specifics` block (hooks read those names)
+- Test / lint / typecheck command in your toolchain (`Gemfile`, `package.json`, …) → update the `Project specifics` block (hooks read those names)
 - Default branch renamed → update `Git conventions` (`git-workflow` reads it)
 - Stack, key directories, deployment target shifts → update `Project specifics`
 - New tool installed (MCP server, CLI) or one removed → update `Tools active in this session`

@@ -81,13 +81,29 @@ check_git_signing() {
 say "claude-kit — doctor"
 say "──────────────────────────────"
 
+# Stack detection — required tools depend on which manifests are present.
+# When neither manifest is present, fall back to Node (claude-kit's own toolchain).
+HAS_RUBY=0
+HAS_NODE=0
+[[ -f "Gemfile" ]] && HAS_RUBY=1
+[[ -f "package.json" ]] && HAS_NODE=1
+if [[ $HAS_RUBY -eq 0 && $HAS_NODE -eq 0 ]]; then
+  HAS_NODE=1
+fi
+
 say
 say "Required CLI tools:"
 check_required "git" "git"
 check_required "jq" "jq"
 check_required "gh" "gh"
-check_required "pnpm" "pnpm"
-check_required "node" "node"
+if [[ $HAS_NODE -eq 1 ]]; then
+  check_required "pnpm" "pnpm"
+  check_required "node" "node"
+fi
+if [[ $HAS_RUBY -eq 1 ]]; then
+  check_required "ruby" "ruby"
+  check_required "bundle" "bundle"
+fi
 
 say
 say "Optional CLI tools:"

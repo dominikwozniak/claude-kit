@@ -190,9 +190,28 @@ if has_feature claude-md; then
   PROJECT_NAME_DEFAULT="$(basename "$TARGET")"
   DEFAULT_BRANCH_DEFAULT="$(detect_default_branch)"
   STACK_DEFAULT="$(detect_stack)"
-  TEST_DEFAULT="$(read_pkg_script test)";       [[ -z "$TEST_DEFAULT"      ]] && TEST_DEFAULT="pnpm test"
-  LINT_DEFAULT="$(read_pkg_script lint)";       [[ -z "$LINT_DEFAULT"      ]] && LINT_DEFAULT="pnpm lint"
-  TYPECHECK_DEFAULT="$(read_pkg_script typecheck)"; [[ -z "$TYPECHECK_DEFAULT" ]] && TYPECHECK_DEFAULT="pnpm typecheck"
+
+  # Stack-aware test/lint/typecheck defaults
+  TEST_DEFAULT=""; LINT_DEFAULT=""; TYPECHECK_DEFAULT=""
+  case "$STACK_DEFAULT" in
+    Ruby)
+      if grep -qE '^[[:space:]]*gem[[:space:]]+["'"'"']standard["'"'"']' Gemfile 2>/dev/null; then
+        LINT_DEFAULT="bundle exec standardrb --fix"
+      elif grep -qE '^[[:space:]]*gem[[:space:]]+["'"'"']rubocop' Gemfile 2>/dev/null; then
+        LINT_DEFAULT="bundle exec rubocop -A"
+      fi
+      if grep -qE '^[[:space:]]*gem[[:space:]]+["'"'"']rspec' Gemfile 2>/dev/null; then
+        TEST_DEFAULT="bundle exec rspec"
+      elif [[ -x bin/rails ]]; then
+        TEST_DEFAULT="bin/rails test"
+      fi
+      ;;
+    "TypeScript / Node"|"JavaScript / Node"|"Deno / TypeScript")
+      TEST_DEFAULT="$(read_pkg_script test)";       [[ -z "$TEST_DEFAULT"      ]] && TEST_DEFAULT="pnpm test"
+      LINT_DEFAULT="$(read_pkg_script lint)";       [[ -z "$LINT_DEFAULT"      ]] && LINT_DEFAULT="pnpm lint"
+      TYPECHECK_DEFAULT="$(read_pkg_script typecheck)"; [[ -z "$TYPECHECK_DEFAULT" ]] && TYPECHECK_DEFAULT="pnpm typecheck"
+      ;;
+  esac
 
   if [[ $NO_PROMPT -eq 0 ]]; then
     echo
@@ -215,18 +234,57 @@ if has_feature claude-md; then
   DEPLOY_TARGET=$(resolve "$ARG_deploy"    "Deployment target (e.g. Vercel, AWS Lambda, n/a)" "_(fill in later)_")
   GOTCHAS=$(resolve "$ARG_gotchas"         "Known gotchas (optional)"                  "_(fill in later)_")
 
+  # Render commands: backtick-quoted when set, italic n/a when empty
+  render_cmd() {
+    if [[ -z "$1" ]]; then printf '%s' '_(n/a)_'
+    else printf '`%s`' "$1"
+    fi
+  }
+  TEST_RENDER="$(render_cmd "$TEST_CMD")"
+  LINT_RENDER="$(render_cmd "$LINT_CMD")"
+  TYPECHECK_RENDER="$(render_cmd "$TYPECHECK_CMD")"
+
+  # Build the Hooks-installed block from selected hooks (raw commands so the
+  # rendered line stays faithful to what each hook actually runs).
+  HOOKS_BLOCK=""
+  if has_hook block-dangerous-git; then
+    HOOKS_BLOCK+='PreToolUse `Bash` → `block-dangerous-git.sh` (blocks force-push, hard-reset, clean -f, etc.)'$'\n'
+  fi
+  if has_hook block-non-pnpm; then
+    HOOKS_BLOCK+='PreToolUse `Bash` → `block-non-pnpm.sh` (enforces pnpm — blocks `npm install`/`yarn`/`bun add`; `npx` and `pnpm dlx` are allowed)'$'\n'
+  fi
+  if has_hook lint-on-edit; then
+    HOOKS_BLOCK+="PostToolUse \`Write|Edit|MultiEdit\` → \`lint-on-edit.sh\` (runs ${LINT_RENDER} on the edited file)"$'\n'
+  fi
+  if has_hook typecheck-on-stop; then
+    HOOKS_BLOCK+="Stop → \`typecheck-on-stop.sh\` (runs ${TYPECHECK_RENDER} when TS files changed)"$'\n'
+  fi
+  [[ -z "$HOOKS_BLOCK" ]] && HOOKS_BLOCK='_(none)_'$'\n'
+
+  HOOKS_TMP="$(mktemp)"
+  printf '%s' "$HOOKS_BLOCK" > "$HOOKS_TMP"
+
   sed \
     -e "s|{{PROJECT_NAME}}|$PROJECT_NAME|g" \
     -e "s|{{DEFAULT_BRANCH}}|$DEFAULT_BRANCH|g" \
     -e "s|{{STACK}}|$STACK|g" \
-    -e "s|{{TEST_COMMAND}}|$TEST_CMD|g" \
-    -e "s|{{LINT_COMMAND}}|$LINT_CMD|g" \
-    -e "s|{{TYPECHECK_COMMAND}}|$TYPECHECK_CMD|g" \
+    -e "s|{{TEST_COMMAND}}|$TEST_RENDER|g" \
+    -e "s|{{LINT_COMMAND}}|$LINT_RENDER|g" \
+    -e "s|{{TYPECHECK_COMMAND}}|$TYPECHECK_RENDER|g" \
     -e "s|{{DOMAIN_BLURB}}|$DOMAIN_BLURB|g" \
     -e "s|{{KEY_DIRS}}|$KEY_DIRS|g" \
     -e "s|{{DEPLOY_TARGET}}|$DEPLOY_TARGET|g" \
     -e "s|{{GOTCHAS}}|$GOTCHAS|g" \
-    "$TEMPLATES/CLAUDE.local.md" > CLAUDE.local.md
+    "$TEMPLATES/CLAUDE.local.md" \
+  | awk -v hooks_file="$HOOKS_TMP" '
+      /\{\{HOOKS_INSTALLED\}\}/ {
+        while ((getline line < hooks_file) > 0) print line
+        close(hooks_file)
+        next
+      }
+      { print }
+    ' > CLAUDE.local.md
+  rm -f "$HOOKS_TMP"
   green "✓ CLAUDE.local.md (root, gitignored)"
 else
   yellow "↷ skipped CLAUDE.local.md (not in --features)"

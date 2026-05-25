@@ -30,20 +30,26 @@ Follow this procedure in order. Each step has a single purpose.
 
 ### 1. Detect repo characteristics
 
-Read just enough of the target project to pre-check the picker boxes intelligently:
+Read just enough of the target project to pre-check the picker boxes intelligently and pick stack-aware defaults:
 
 ```bash
 test -f package.json && echo "has-pkg"
 test -f tsconfig.json && echo "has-tsconfig"
+test -f Gemfile && echo "has-gemfile"
 jq -r '.scripts.lint // empty' package.json 2>/dev/null
+grep -q 'gem .standard.' Gemfile 2>/dev/null && echo "has-standardrb"
+grep -q 'gem .rubocop' Gemfile 2>/dev/null && echo "has-rubocop"
+grep -q 'gem .rspec'   Gemfile 2>/dev/null && echo "has-rspec"
 ```
+
+(The exact Gemfile detection regex lives in `bootstrap.sh`; the snippet above is illustrative — agents can read the script for the precise quoting.)
 
 Use the results to decide pre-check defaults for step 3:
 
-- `block-non-pnpm.sh` — pre-check only if `package.json` exists
-- `lint-on-edit.sh` — pre-check only if `package.json` has a `lint` script
-- `typecheck-on-stop.sh` — pre-check only if `tsconfig.json` exists
-- `block-dangerous-git.sh` — always pre-check
+- `block-dangerous-git.sh` — always pre-check (stack-neutral)
+- `block-non-pnpm.sh` — pre-check only if `package.json` exists. Hide entirely on Ruby-only repos.
+- `lint-on-edit.sh` — pre-check only if `package.json` has a `lint` script. Hide on Ruby-only repos (regex matches JS extensions).
+- `typecheck-on-stop.sh` — pre-check only if `tsconfig.json` exists. Hide on Ruby-only repos.
 
 ### 2. Run doctor.sh for missing deps
 
@@ -65,12 +71,12 @@ Three questions (skip question 2 if answer to Q1 doesn't include `settings`; ski
 
 **Question 2 — Hooks to install (multi-select, only if `settings` selected above):**
 
-- `block-dangerous-git` — universal git guardrail
-- `block-non-pnpm` — JS/TS only
-- `lint-on-edit` — only useful with a lint script
-- `typecheck-on-stop` — TypeScript only
+- `block-dangerous-git` — universal git guardrail (always offered)
+- `block-non-pnpm` — JS/TS only (skip on Ruby-only repos)
+- `lint-on-edit` — only useful with a lint script (skip on Ruby-only repos)
+- `typecheck-on-stop` — TypeScript only (skip on Ruby-only repos)
 
-Use the detection results from step 1 as the default-checked set.
+Use the detection results from step 1 as the default-checked set. Filter out JS-only hooks when `package.json` is absent — on a pure Rails repo, only `block-dangerous-git` is offered.
 
 **Question 3 — Missing deps to brew install (multi-select, only when applicable):**
 
@@ -83,8 +89,13 @@ Only if `CLAUDE.local.md` was selected. Use a single AskUserQuestion round with 
 - `project-name` → `basename "$(pwd)"`
 - `default-branch` → `git symbolic-ref --short refs/remotes/origin/HEAD | sed 's@^origin/@@'` or `git config --get init.defaultBranch` or `main`
 - `stack` → detect from `package.json` / `tsconfig.json` / `Cargo.toml` / `pyproject.toml` / `Gemfile`
-- `test-cmd`, `lint-cmd`, `typecheck-cmd` → `jq -r '.scripts.<name>'` of `package.json`
+- `test-cmd`, `lint-cmd`, `typecheck-cmd` — stack-dependent:
+  - **Node / TS**: `jq -r '.scripts.<name>'` of `package.json`, falling back to `pnpm <name>`.
+  - **Ruby**: `bundle exec rspec` (or `bin/rails test` if no rspec gem) for test, `bundle exec standardrb --fix` or `bundle exec rubocop -A` based on `Gemfile` for lint, empty (renders as `_(n/a)_`) for typecheck.
+  - **Other / unknown**: leave empty so the user fills them in.
 - `domain`, `key-dirs`, `deploy`, `gotchas` → empty (user fills later)
+
+Bootstrap.sh handles all of the above auto-detection — you only need to pass the flags the user explicitly overrides.
 
 ### 5. Invoke bootstrap.sh with flags
 
