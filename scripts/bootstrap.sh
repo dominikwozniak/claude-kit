@@ -2,7 +2,21 @@
 # Drop claude-kit templates into a target project.
 # Everything written is local/gitignored — safe to overwrite.
 #
-# Usage: bootstrap.sh <target-dir>
+# Usage:
+#   bootstrap.sh <target-dir> [flags]
+#
+# Flags (all optional, defaults install everything):
+#   --features=claude-md,settings,gitignore
+#       Top-level artifacts to install. Default: all.
+#   --hooks=block-dangerous-git,block-non-pnpm,lint-on-edit,typecheck-on-stop
+#       Hook scripts to drop in .claude/hooks/. Default: all four. Empty (--hooks=) installs none.
+#   --brew-install=rtk,gh,jq
+#       Comma-separated tools to `brew install` if missing. Gated on `command -v brew`. Default: none.
+#   --project-name=… --default-branch=… --stack=… --test-cmd=… --lint-cmd=…
+#   --typecheck-cmd=… --domain=… --key-dirs=… --deploy=… --gotchas=…
+#       CLAUDE.local.md placeholder values. Fall back to auto-detect when absent.
+#   --no-prompt
+#       Skip every interactive read. Combine with explicit flags for unattended runs.
 
 set -uo pipefail
 
@@ -14,12 +28,63 @@ green() { printf "\033[32m%s\033[0m\n" "$1"; }
 yellow() { printf "\033[33m%s\033[0m\n" "$1"; }
 red() { printf "\033[31m%s\033[0m\n" "$1"; }
 
-if [[ $# -ne 1 ]]; then
-  red "Usage: $0 <target-dir>"
+# --- Argument parsing -----------------------------------------------------
+
+TARGET=""
+FEATURES=""
+HOOKS=""
+BREW=""
+NO_PROMPT=0
+FEATURES_SET=0
+HOOKS_SET=0
+
+# Placeholder vars (set by --foo=bar flags below)
+ARG_project_name=""
+ARG_default_branch=""
+ARG_stack=""
+ARG_test_cmd=""
+ARG_lint_cmd=""
+ARG_typecheck_cmd=""
+ARG_domain=""
+ARG_key_dirs=""
+ARG_deploy=""
+ARG_gotchas=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --features=*)        FEATURES="${arg#*=}"; FEATURES_SET=1 ;;
+    --hooks=*)           HOOKS="${arg#*=}"; HOOKS_SET=1 ;;
+    --brew-install=*)    BREW="${arg#*=}" ;;
+    --no-prompt)         NO_PROMPT=1 ;;
+    --project-name=*)    ARG_project_name="${arg#*=}" ;;
+    --default-branch=*)  ARG_default_branch="${arg#*=}" ;;
+    --stack=*)           ARG_stack="${arg#*=}" ;;
+    --test-cmd=*)        ARG_test_cmd="${arg#*=}" ;;
+    --lint-cmd=*)        ARG_lint_cmd="${arg#*=}" ;;
+    --typecheck-cmd=*)   ARG_typecheck_cmd="${arg#*=}" ;;
+    --domain=*)          ARG_domain="${arg#*=}" ;;
+    --key-dirs=*)        ARG_key_dirs="${arg#*=}" ;;
+    --deploy=*)          ARG_deploy="${arg#*=}" ;;
+    --gotchas=*)         ARG_gotchas="${arg#*=}" ;;
+    --*)
+      red "Unknown flag: $arg"
+      exit 1
+      ;;
+    *)
+      if [[ -z "$TARGET" ]]; then TARGET="$arg"; else
+        red "Unexpected positional argument: $arg"
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+if [[ -z "$TARGET" ]]; then
+  red "Usage: $0 <target-dir> [flags]  (run with --help-like inspection of the file header)"
   exit 1
 fi
 
-TARGET="$(cd "$1" 2>/dev/null && pwd)" || {
+TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
   red "Target directory not found: $1"
   exit 1
 }
@@ -29,31 +94,52 @@ if [[ ! -d "$TARGET/.git" ]]; then
   exit 1
 fi
 
+# Defaults when unset
+[[ $FEATURES_SET -eq 0 ]] && FEATURES="claude-md,settings,gitignore"
+[[ $HOOKS_SET -eq 0 ]] && HOOKS="block-dangerous-git,block-non-pnpm,lint-on-edit,typecheck-on-stop"
+
+has_feature() { [[ ",$FEATURES," == *",$1,"* ]]; }
+has_hook()    { [[ ",$HOOKS," == *",$1,"* ]]; }
+
 echo "Bootstrapping claude-kit into: $TARGET"
+echo "  features: ${FEATURES:-(none)}"
+echo "  hooks:    ${HOOKS:-(none)}"
+[[ -n "$BREW" ]] && echo "  brew:     $BREW"
 echo
 
-# Optional doctor — warn but continue.
+# --- Doctor (warn-only) ---------------------------------------------------
+
 if [[ -x "$SCRIPT_DIR/doctor.sh" ]]; then
   yellow "Running doctor.sh (warn-only)…"
   "$SCRIPT_DIR/doctor.sh" || yellow "doctor.sh reported missing tools — continuing anyway."
   echo
 fi
 
+# --- Optional brew install of missing deps --------------------------------
+
+if [[ -n "$BREW" ]]; then
+  if command -v brew >/dev/null 2>&1; then
+    IFS=',' read -ra BREW_TOOLS <<< "$BREW"
+    for tool in "${BREW_TOOLS[@]}"; do
+      [[ -z "$tool" ]] && continue
+      if command -v "$tool" >/dev/null 2>&1; then
+        green "✓ $tool already installed"
+      else
+        yellow "→ brew install $tool"
+        brew install "$tool" || red "  brew install $tool failed — continuing"
+      fi
+    done
+    echo
+  else
+    yellow "↷ --brew-install requested but brew not on PATH — skipping"
+    echo
+  fi
+fi
+
 cd "$TARGET" || exit 1
 mkdir -p .claude/hooks .agent/handoffs
 
 # --- Helpers ---------------------------------------------------------------
-
-prompt_overwrite() {
-  local file="$1"
-  if [[ -f "$file" ]]; then
-    yellow "$file already exists."
-    read -r -p "  Overwrite? [y/N] " yn </dev/tty
-    [[ "$yn" =~ ^[Yy]$ ]]
-  else
-    true
-  fi
-}
 
 detect_default_branch() {
   local b
@@ -83,37 +169,51 @@ detect_stack() {
   fi
 }
 
-prompt_or_default() {
-  local label="$1" suggestion="$2" reply
+# Resolve placeholder value: flag wins; else prompt (unless --no-prompt); else suggestion.
+resolve() {
+  local flag_val="$1" label="$2" suggestion="$3" reply
+  if [[ -n "$flag_val" ]]; then
+    echo "$flag_val"
+    return
+  fi
+  if [[ $NO_PROMPT -eq 1 ]]; then
+    echo "$suggestion"
+    return
+  fi
   read -r -p "  $label [$suggestion]: " reply </dev/tty
   echo "${reply:-$suggestion}"
 }
 
 # --- 1. CLAUDE.local.md (root) --------------------------------------------
 
-if prompt_overwrite "CLAUDE.local.md"; then
-  PROJECT_NAME="$(basename "$TARGET")"
-  DEFAULT_BRANCH="$(detect_default_branch)"
-  STACK="$(detect_stack)"
-  TEST_CMD="$(read_pkg_script test)"
-  LINT_CMD="$(read_pkg_script lint)"
-  TYPECHECK_CMD="$(read_pkg_script typecheck)"
+if has_feature claude-md; then
+  PROJECT_NAME_DEFAULT="$(basename "$TARGET")"
+  DEFAULT_BRANCH_DEFAULT="$(detect_default_branch)"
+  STACK_DEFAULT="$(detect_stack)"
+  TEST_DEFAULT="$(read_pkg_script test)";       [[ -z "$TEST_DEFAULT"      ]] && TEST_DEFAULT="pnpm test"
+  LINT_DEFAULT="$(read_pkg_script lint)";       [[ -z "$LINT_DEFAULT"      ]] && LINT_DEFAULT="pnpm lint"
+  TYPECHECK_DEFAULT="$(read_pkg_script typecheck)"; [[ -z "$TYPECHECK_DEFAULT" ]] && TYPECHECK_DEFAULT="pnpm typecheck"
 
-  echo
-  echo "Confirm project specifics (press Enter to accept suggestion):"
-  PROJECT_NAME=$(prompt_or_default "Project name" "$PROJECT_NAME")
-  DEFAULT_BRANCH=$(prompt_or_default "Default branch" "$DEFAULT_BRANCH")
-  STACK=$(prompt_or_default "Stack" "$STACK")
-  TEST_CMD=$(prompt_or_default "Test command" "${TEST_CMD:-npm test}")
-  LINT_CMD=$(prompt_or_default "Lint command" "${LINT_CMD:-npm run lint}")
-  TYPECHECK_CMD=$(prompt_or_default "Typecheck command" "${TYPECHECK_CMD:-npm run typecheck}")
+  if [[ $NO_PROMPT -eq 0 ]]; then
+    echo
+    echo "Confirm project specifics (press Enter to accept suggestion):"
+  fi
 
-  echo
-  echo "Project context (1 line each — Enter to skip, fill later):"
-  DOMAIN_BLURB=$(prompt_or_default "Domain blurb (what this project does)" "_(fill in later)_")
-  KEY_DIRS=$(prompt_or_default "Key directories (e.g. src/, packages/api/)" "_(fill in later)_")
-  DEPLOY_TARGET=$(prompt_or_default "Deployment target (e.g. Vercel, AWS Lambda, n/a)" "_(fill in later)_")
-  GOTCHAS=$(prompt_or_default "Known gotchas (optional)" "_(fill in later)_")
+  PROJECT_NAME=$(resolve "$ARG_project_name"   "Project name"        "$PROJECT_NAME_DEFAULT")
+  DEFAULT_BRANCH=$(resolve "$ARG_default_branch" "Default branch"    "$DEFAULT_BRANCH_DEFAULT")
+  STACK=$(resolve "$ARG_stack"                  "Stack"              "$STACK_DEFAULT")
+  TEST_CMD=$(resolve "$ARG_test_cmd"            "Test command"       "$TEST_DEFAULT")
+  LINT_CMD=$(resolve "$ARG_lint_cmd"            "Lint command"       "$LINT_DEFAULT")
+  TYPECHECK_CMD=$(resolve "$ARG_typecheck_cmd"  "Typecheck command"  "$TYPECHECK_DEFAULT")
+
+  if [[ $NO_PROMPT -eq 0 ]]; then
+    echo
+    echo "Project context (1 line each — Enter to skip, fill later):"
+  fi
+  DOMAIN_BLURB=$(resolve "$ARG_domain"     "Domain blurb (what this project does)"     "_(fill in later)_")
+  KEY_DIRS=$(resolve "$ARG_key_dirs"       "Key directories (e.g. src/, packages/api/)" "_(fill in later)_")
+  DEPLOY_TARGET=$(resolve "$ARG_deploy"    "Deployment target (e.g. Vercel, AWS Lambda, n/a)" "_(fill in later)_")
+  GOTCHAS=$(resolve "$ARG_gotchas"         "Known gotchas (optional)"                  "_(fill in later)_")
 
   sed \
     -e "s|{{PROJECT_NAME}}|$PROJECT_NAME|g" \
@@ -129,41 +229,46 @@ if prompt_overwrite "CLAUDE.local.md"; then
     "$TEMPLATES/CLAUDE.local.md" > CLAUDE.local.md
   green "✓ CLAUDE.local.md (root, gitignored)"
 else
-  yellow "↷ skipped CLAUDE.local.md"
+  yellow "↷ skipped CLAUDE.local.md (not in --features)"
 fi
 
 # --- 2. .claude/settings.local.json ---------------------------------------
 
-if prompt_overwrite ".claude/settings.local.json"; then
+if has_feature settings; then
   cp "$TEMPLATES/settings.local.json" .claude/settings.local.json
   green "✓ .claude/settings.local.json"
 else
-  yellow "↷ skipped .claude/settings.local.json"
+  yellow "↷ skipped .claude/settings.local.json (not in --features)"
 fi
 
 # --- 3. Hook scripts ------------------------------------------------------
 
 for hook in block-dangerous-git.sh block-non-pnpm.sh lint-on-edit.sh typecheck-on-stop.sh; do
-  if prompt_overwrite ".claude/hooks/$hook"; then
+  hook_key="${hook%.sh}"
+  if has_hook "$hook_key"; then
     cp "$TEMPLATES/hooks/$hook" ".claude/hooks/$hook"
     chmod +x ".claude/hooks/$hook"
     green "✓ .claude/hooks/$hook"
   else
-    yellow "↷ skipped .claude/hooks/$hook"
+    yellow "↷ skipped .claude/hooks/$hook (not in --hooks)"
   fi
 done
 
 # --- 4. .gitignore additions (idempotent via marker) ----------------------
 
-MARKER_BEGIN="# claude-kit bootstrap (BEGIN)"
-touch .gitignore
+if has_feature gitignore; then
+  MARKER_BEGIN="# claude-kit bootstrap (BEGIN)"
+  touch .gitignore
 
-if grep -qF "$MARKER_BEGIN" .gitignore; then
-  yellow "↷ .gitignore already has bootstrap block — skipping"
+  if grep -qF "$MARKER_BEGIN" .gitignore; then
+    yellow "↷ .gitignore already has bootstrap block — skipping"
+  else
+    echo "" >> .gitignore
+    cat "$TEMPLATES/gitignore-additions" >> .gitignore
+    green "✓ appended to .gitignore"
+  fi
 else
-  echo "" >> .gitignore
-  cat "$TEMPLATES/gitignore-additions" >> .gitignore
-  green "✓ appended to .gitignore"
+  yellow "↷ skipped .gitignore additions (not in --features)"
 fi
 
 # --- 5. Final reminder ----------------------------------------------------

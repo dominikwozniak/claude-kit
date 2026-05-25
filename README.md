@@ -36,7 +36,7 @@ Then, inside any project you want to bootstrap, invoke the `bootstrap-workflow` 
 
 Four plugins, each solving one concrete pain. Install only what you need.
 
-**`bootstrap-workflow`** — Runs `bootstrap.sh` against the current project. Drops `CLAUDE.local.md`, `.claude/settings.local.json`, three hook scripts, and appends `.agent/` to `.gitignore`. Every drop is local and gitignored, so re-running is always safe. Use it for the first setup in any new repo.
+**`bootstrap-workflow`** — Runs `bootstrap.sh` against the current project. À la carte picker (via `AskUserQuestion`): pick which artifacts you want, which hooks to wire, and which missing deps to `brew install`. Pre-checks defaults from the repo's actual stack (no `block-non-pnpm` if there's no `package.json`, no `typecheck-on-stop` if there's no `tsconfig.json`). Every drop is local and gitignored, so re-running is always safe. Use it for the first setup in any new repo.
 
 **`git-workflow`** — A single configurable commit / push / PR / sync skill. Reads `CLAUDE.local.md` for per-repo conventions (commit format, default branch, PR template), falls back to defaults when the file is missing. Replaces five drive-by commands with one that knows the project.
 
@@ -83,9 +83,22 @@ Not bundled here. Install separately for the full experience:
 └── .gitignore                 # appended with .agent/, CLAUDE.local.md, settings.local.json, hooks
 ```
 
-Re-running is safe — every prompt asks before overwrite and the `.gitignore` block is idempotent (marker-fenced).
+Selection is the gate: only what you tick in the picker gets written. The `.gitignore` block is marker-fenced and idempotent, so re-running with the same selection is a no-op. De-selecting a hook later does not delete a previously installed file — drop it by hand if you want it gone.
 
 `setup-pre-commit` is the one exception — it **commits** husky + lint-staged config so the whole team is bound.
+
+### Direct invocation
+
+Outside Claude, run the script yourself:
+
+```bash
+scripts/bootstrap.sh /path/to/project                                  # all features, all hooks (default)
+scripts/bootstrap.sh /path/to/project --features=claude-md --hooks=    # CLAUDE.local.md only
+scripts/bootstrap.sh /path/to/project --no-prompt --project-name=foo   # CI-safe, flag-driven
+scripts/doctor.sh --json                                               # machine-readable health check
+```
+
+Flags: `--features=claude-md,settings,gitignore`, `--hooks=block-dangerous-git,block-non-pnpm,lint-on-edit,typecheck-on-stop`, `--brew-install=<tool,...>`, `--project-name=`, `--default-branch=`, `--stack=`, `--test-cmd=`, `--lint-cmd=`, `--typecheck-cmd=`, `--domain=`, `--key-dirs=`, `--deploy=`, `--gotchas=`, `--no-prompt`. Anything you omit falls back to interactive prompt (unless `--no-prompt`) or auto-detection.
 
 ## ✅ Quality bar
 

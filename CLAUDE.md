@@ -22,6 +22,7 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 - Canonical skill file: `skills/<name>/SKILL.md`
 - Each plugin: `plugins/<name>/.claude-plugin/plugin.json` + `plugins/<name>/skills/<name>` (symlink → `../../../skills/<name>`)
 - All bootstrap drops are LOCAL (gitignored in target project) — overwrite is always safe
+- `bootstrap.sh` is **flag-driven** and non-interactive when called with `--no-prompt`. Selection (`--features`, `--hooks`, `--brew-install`) is the gate — if a feature is on, it gets written; if off, it doesn't. No per-file overwrite prompts. The `bootstrap-workflow` skill collects the selection via `AskUserQuestion` and passes flags. `doctor.sh --json` feeds the brew-install picker.
 - `setup-pre-commit` is the one exception — it COMMITS to the target repo (husky binds teammates)
 - **pnpm-only enforcement** has two layers: `templates/hooks/block-non-pnpm.sh` (PreToolUse hook, gitignored, blocks `npm`/`yarn`/`bun` during Claude sessions) + `setup-pre-commit` (committed, enforces for teammates and CI). Both ship with claude-kit; don't add a third layer.
 
@@ -29,7 +30,7 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 
 - New skill → create `skills/<name>/SKILL.md` AND `ln -s ../../../skills/<name> plugins/<name>/skills/<name>` AND `git add` the symlink AND add row to `.claude-plugin/marketplace.json` AND update README plugins table
 - New plugin (reusing existing skill) → create `plugins/<name>/.claude-plugin/plugin.json` + symlink to the canonical skill + marketplace row
-- New hook script → add to `templates/hooks/` AND to `templates/gitignore-additions` AND to the hook wiring in `templates/settings.local.json`
+- New hook script → add to `templates/hooks/` AND to `templates/gitignore-additions` AND to the hook wiring in `templates/settings.local.json` AND to the `bootstrap.sh` hook loop AND as a multi-select option in `skills/bootstrap-workflow/SKILL.md` step 3 (with a sensible pre-check rule based on stack detection)
 - New doc → link from README "What you get" if user-facing
 - Touching `scripts/bootstrap.sh` or anything under `templates/` → no extra steps; the `plugins/bootstrap-workflow/{scripts,templates}` symlinks pick up changes automatically (don't duplicate files into the plugin dir)
 - **Doc sync** — after any change, ask: does it shift what users see (`README.md`), what agents need to know (`CLAUDE.md`), or how the daily loop/bootstrap behaves (`docs/`)? Update the affected file(s) in the same commit. New plugin / pain narrative → README. New convention, new symlink, new enforcement layer → CLAUDE.md. New skill in the loop or new bootstrap step → `docs/workflow.md` or related doc. Skip if change is purely internal (lockfile, prettier-only reformat, CI tweak with no behaviour change).
