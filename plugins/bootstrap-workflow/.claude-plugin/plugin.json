@@ -1,6 +1,6 @@
 {
   "name": "bootstrap-workflow",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Drop claude-kit templates (CLAUDE.local.md, settings.local.json, hooks, gitignore additions) into a project. All artifacts are local/gitignored.",
   "author": {
     "name": "Dominik Wozniak"

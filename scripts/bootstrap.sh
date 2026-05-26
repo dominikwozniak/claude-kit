@@ -8,8 +8,8 @@
 # Flags (all optional, defaults install everything):
 #   --features=claude-md,settings,gitignore
 #       Top-level artifacts to install. Default: all.
-#   --hooks=block-dangerous-git,block-non-pnpm,lint-on-edit,typecheck-on-stop
-#       Hook scripts to drop in .claude/hooks/. Default: all four. Empty (--hooks=) installs none.
+#   --hooks=block-dangerous-git,block-non-pnpm,lint-on-edit,lint-on-edit-rb,typecheck-on-stop
+#       Hook scripts to drop in .claude/hooks/. Default: all. Empty (--hooks=) installs none.
 #   --brew-install=rtk,gh,jq
 #       Comma-separated tools to `brew install` if missing. Gated on `command -v brew`. Default: none.
 #   --project-name=… --default-branch=… --stack=… --test-cmd=… --lint-cmd=…
@@ -96,7 +96,7 @@ fi
 
 # Defaults when unset
 [[ $FEATURES_SET -eq 0 ]] && FEATURES="claude-md,settings,gitignore"
-[[ $HOOKS_SET -eq 0 ]] && HOOKS="block-dangerous-git,block-non-pnpm,lint-on-edit,typecheck-on-stop"
+[[ $HOOKS_SET -eq 0 ]] && HOOKS="block-dangerous-git,block-non-pnpm,lint-on-edit,lint-on-edit-rb,typecheck-on-stop"
 
 has_feature() { [[ ",$FEATURES," == *",$1,"* ]]; }
 has_hook()    { [[ ",$HOOKS," == *",$1,"* ]]; }
@@ -177,6 +177,7 @@ build_hooks_json() {
   has_hook block-dangerous-git && pre+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-git.sh\""}')
   has_hook block-non-pnpm     && pre+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-non-pnpm.sh\""}')
   has_hook lint-on-edit       && post+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/lint-on-edit.sh\"","timeout":30,"statusMessage":"Linting changed file..."}')
+  has_hook lint-on-edit-rb    && post+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/lint-on-edit-rb.sh\"","timeout":30,"statusMessage":"Linting changed Ruby file..."}')
   has_hook typecheck-on-stop  && stop+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/typecheck-on-stop.sh\"","timeout":60,"statusMessage":"Running typecheck (if TS files changed)..."}')
 
   local parts=() joined
@@ -288,6 +289,9 @@ if has_feature claude-md; then
   if has_hook lint-on-edit; then
     HOOKS_BLOCK+="PostToolUse \`Write|Edit|MultiEdit\` → \`lint-on-edit.sh\` (runs ${LINT_RENDER} on the edited file)"$'\n'
   fi
+  if has_hook lint-on-edit-rb; then
+    HOOKS_BLOCK+="PostToolUse \`Write|Edit|MultiEdit\` → \`lint-on-edit-rb.sh\` (runs ${LINT_RENDER} on edited \`.rb\` files via bundle exec)"$'\n'
+  fi
   if has_hook typecheck-on-stop; then
     HOOKS_BLOCK+="Stop → \`typecheck-on-stop.sh\` (runs ${TYPECHECK_RENDER} when TS files changed)"$'\n'
   fi
@@ -342,7 +346,7 @@ fi
 
 # --- 3. Hook scripts ------------------------------------------------------
 
-for hook in block-dangerous-git.sh block-non-pnpm.sh lint-on-edit.sh typecheck-on-stop.sh; do
+for hook in block-dangerous-git.sh block-non-pnpm.sh lint-on-edit.sh lint-on-edit-rb.sh typecheck-on-stop.sh; do
   hook_key="${hook%.sh}"
   if has_hook "$hook_key"; then
     cp "$TEMPLATES/hooks/$hook" ".claude/hooks/$hook"

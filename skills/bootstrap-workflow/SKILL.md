@@ -21,6 +21,7 @@ Apply the claude-kit personal setup to the current project. Everything dropped i
 - `.claude/hooks/block-dangerous-git.sh` — PreToolUse guard, blocks force-push / hard-reset / etc.
 - `.claude/hooks/block-non-pnpm.sh` — PreToolUse guard, blocks npm / yarn / bun
 - `.claude/hooks/lint-on-edit.sh` — PostToolUse, lints edited TS/JS files
+- `.claude/hooks/lint-on-edit-rb.sh` — PostToolUse, lints edited `.rb` files via `bundle exec standardrb`/`rubocop` (~1-2s per edit)
 - `.claude/hooks/typecheck-on-stop.sh` — Stop hook, typechecks on TS file changes
 - `.gitignore` — appends idempotent block fencing the above
 
@@ -49,6 +50,7 @@ Use the results to decide pre-check defaults for step 3:
 - `block-dangerous-git.sh` — always pre-check (stack-neutral)
 - `block-non-pnpm.sh` — pre-check only if `package.json` exists. Hide entirely on Ruby-only repos.
 - `lint-on-edit.sh` — pre-check only if `package.json` has a `lint` script. Hide on Ruby-only repos (regex matches JS extensions).
+- `lint-on-edit-rb.sh` — pre-check only if `Gemfile` has `gem 'standard'` or `gem 'rubocop'`. Hide on JS-only repos (no `Gemfile`).
 - `typecheck-on-stop.sh` — pre-check only if `tsconfig.json` exists. Hide on Ruby-only repos.
 
 ### 2. Run doctor.sh for missing deps
@@ -73,10 +75,11 @@ Three questions (skip question 2 if answer to Q1 doesn't include `settings`; ski
 
 - `block-dangerous-git` — universal git guardrail (always offered)
 - `block-non-pnpm` — JS/TS only (skip on Ruby-only repos)
-- `lint-on-edit` — only useful with a lint script (skip on Ruby-only repos)
+- `lint-on-edit` — only useful with a JS/TS lint script (skip on Ruby-only repos)
+- `lint-on-edit-rb` — Ruby only (skip on JS-only repos); adds ~1-2s per `.rb` edit (bundle exec startup)
 - `typecheck-on-stop` — TypeScript only (skip on Ruby-only repos)
 
-Use the detection results from step 1 as the default-checked set. Filter out JS-only hooks when `package.json` is absent — on a pure Rails repo, only `block-dangerous-git` is offered.
+Use the detection results from step 1 as the default-checked set. Filter out JS-only hooks when `package.json` is absent — on a pure Rails repo with `standardrb`/`rubocop` in the `Gemfile`, the offer is `block-dangerous-git` + `lint-on-edit-rb` (still ≥ 2 options, multi-select works).
 
 If filtering leaves **fewer than 2 options**, do not call `AskUserQuestion` with a multi-select — that violates the tool's `minItems: 2` validation. Instead, ask a single Yes/No question naming the lone remaining hook (e.g. _"Install `block-dangerous-git` hook?"_) with options `Yes (recommended)` / `No`. Map `Yes` → include that hook in `--hooks=`; `No` → pass `--hooks=` empty. Q1 (artifacts) always has 3 fixed options, so this fallback only ever applies to Q2 and Q3.
 
