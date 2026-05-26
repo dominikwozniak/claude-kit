@@ -169,6 +169,38 @@ detect_stack() {
   fi
 }
 
+# Build the .hooks JSON block from selected hooks. Parallel to HOOKS_BLOCK
+# below — same has_hook guards, so what's wired in settings.local.json always
+# matches what's copied to .claude/hooks/ and what's documented in CLAUDE.local.md.
+build_hooks_json() {
+  local pre=() post=() stop=()
+  has_hook block-dangerous-git && pre+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-git.sh\""}')
+  has_hook block-non-pnpm     && pre+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-non-pnpm.sh\""}')
+  has_hook lint-on-edit       && post+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/lint-on-edit.sh\"","timeout":30,"statusMessage":"Linting changed file..."}')
+  has_hook typecheck-on-stop  && stop+=('{"type":"command","command":"bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/typecheck-on-stop.sh\"","timeout":60,"statusMessage":"Running typecheck (if TS files changed)..."}')
+
+  local parts=() joined
+  if (( ${#pre[@]} > 0 )); then
+    joined=$(IFS=,; echo "${pre[*]}")
+    parts+=("\"PreToolUse\":[{\"matcher\":\"Bash\",\"hooks\":[${joined}]}]")
+  fi
+  if (( ${#post[@]} > 0 )); then
+    joined=$(IFS=,; echo "${post[*]}")
+    parts+=("\"PostToolUse\":[{\"matcher\":\"Write|Edit|MultiEdit\",\"hooks\":[${joined}]}]")
+  fi
+  if (( ${#stop[@]} > 0 )); then
+    joined=$(IFS=,; echo "${stop[*]}")
+    parts+=("\"Stop\":[{\"hooks\":[${joined}]}]")
+  fi
+
+  if (( ${#parts[@]} == 0 )); then
+    echo "{}"
+  else
+    joined=$(IFS=,; echo "${parts[*]}")
+    echo "{${joined}}"
+  fi
+}
+
 # Resolve placeholder value: flag wins; else prompt (unless --no-prompt); else suggestion.
 resolve() {
   local flag_val="$1" label="$2" suggestion="$3" reply
@@ -293,7 +325,16 @@ fi
 # --- 2. .claude/settings.local.json ---------------------------------------
 
 if has_feature settings; then
-  cp "$TEMPLATES/settings.local.json" .claude/settings.local.json
+  HOOKS_JSON="$(build_hooks_json)"
+  # Bash parameter expansion — no escape interpretation (JSON has \" and {…}).
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    printf '%s\n' "${line//\{\{HOOKS_JSON\}\}/$HOOKS_JSON}"
+  done < "$TEMPLATES/settings.local.json.tmpl" > .claude/settings.local.json
+
+  # Best-effort pretty-print when jq is available; minified output is also valid.
+  if command -v jq >/dev/null 2>&1; then
+    tmp="$(mktemp)" && jq . .claude/settings.local.json > "$tmp" && mv "$tmp" .claude/settings.local.json
+  fi
   green "✓ .claude/settings.local.json"
 else
   yellow "↷ skipped .claude/settings.local.json (not in --features)"
