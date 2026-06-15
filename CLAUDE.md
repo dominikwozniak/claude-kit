@@ -49,11 +49,11 @@ This is **not** a code project — it's a Claude Code starter kit. Skills, templ
 - `pnpm lint` — `agnix .` validates CLAUDE.md, SKILL.md, hooks, manifests (config: `.agnix.toml`, `templates/` excluded — placeholders, not real configs)
 - `pnpm format` — `prettier --check` on md/json/yaml (config: `.prettierrc.json`, `proseWrap: preserve` so SKILL.md trigger tokens aren't rewrapped)
 - `pnpm validate:manifests` — `claude plugin validate` on every `marketplace.json` + `plugin.json` plus version sync check between marketplace.json[].version and `<source>/.claude-plugin/plugin.json.version`
-- Workflows in `.github/workflows/` run all three on `pull_request` + `push` to `main`; actions SHA-pinned, runner `ubuntu-latest`
+- `secrets-scan` — `trufflehog` (SHA-pinned) scans for verified/unknown leaked secrets; full-history checkout (`fetch-depth: 0`)
+- Workflows in `.github/workflows/` run on `pull_request` + `push` to `main`; actions SHA-pinned, runner `ubuntu-latest`
 
 ## Not in scope
 
-- Secret scanning workflows — `AirHelp/ai-hub` and `byarcadia-app/hub` use reusable workflows from private orgs; standalone gitleaks/trufflehog can be added later
 - `sync-public-skills` — no public skills to sync; add if upstream sources appear
 - AGENTS.md symlink (skip for v1; add if codex compat needed)
 - Memory/notes layer — that's `claude-mem`, not this repo
