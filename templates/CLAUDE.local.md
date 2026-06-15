@@ -33,7 +33,7 @@ Read by the `git-workflow` skill. Overrides global defaults.
 - **PR title**: same format as commit subject.
 - **NO** `Co-Authored-By` trailer. **NO** "Generated with Claude Code" footer.
 - **Rebase by default**: `git pull --rebase`, `git fetch origin && git rebase origin/{{DEFAULT_BRANCH}}`
-- **Signed commits**: this repo expects signed commits. Verify with `git config --global --get commit.gpgsign` (must be `true`). If unsigned, use `git commit -S` per commit or set `git config --global commit.gpgsign true` once.
+- **Signed commits**: SSH signing is already configured globally — `commit.gpgsign=true`, `gpg.format=ssh`, `user.signingkey` set. Plain `git commit` signs automatically and GitHub shows "Verified". **Do NOT** add `-S`, run `git config` to "fix" signing, or verify locally with `git log --show-signature` / `git verify-commit`. Local SSH verification needs `gpg.ssh.allowedSignersFile` (intentionally not set), so local checks report "No signature" even though the commit is signed and verified on GitHub — that gap is expected, never try to repair it. Only if a `git commit` genuinely errors out while signing: surface the error, don't reconfigure.
 - **Modern verbs**: `git switch` / `git restore` over `git checkout`
 - **One logical change per commit**. Split when session work spans multiple concerns.
 - **Stash**: `git stash push -m "<description>"` over bare `git stash`.
