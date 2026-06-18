@@ -1,5 +1,19 @@
 # 🧰 claude-kit
 
+> ## ⚠️ Deprecated — archived
+>
+> Superseded by **[dominikwozniak-skills](https://github.com/dominikwozniak/dominikwozniak-skills)**,
+> which ships the same workflow as `dw-*` skills. Install that marketplace instead.
+>
+> | claude-kit plugin    | replacement                                                                              |
+> | -------------------- | ---------------------------------------------------------------------------------------- |
+> | `bootstrap-workflow` | `dw-bootstrap`                                                                           |
+> | `git-workflow`       | `dw-git`                                                                                 |
+> | `session-handoff`    | `dw-handoff`                                                                             |
+> | `setup-pre-commit`   | _no direct successor_ — git pre-commit layer; recover from this repo's history if needed |
+>
+> This repository is **archived** (read-only). History is preserved.
+
 An opinionated Claude Code starter kit. Drop it into any project and get the same sane AI dev loop
 everywhere — bootstrap, git workflow, session handoff, optional pre-commit, plus the guardrails to
 keep the agent from breaking things.
